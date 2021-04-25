@@ -10,37 +10,31 @@ namespace StreamLogger
     {
         public static bool DebugMode = false;
         
-        private static readonly string infoStr = "[INFO]".Pastel("eee8d5");
-        private static readonly string warnStr = "[WARN]".Pastel("b58900");
-        private static readonly string errorStr = "[ERROR]".Pastel("dc322f");
-        private static readonly string debugStr = "[DEBUG]".Pastel("2aa198");
+        private static readonly string InfoStr = "[INFO]".Pastel("eee8d5");
+        private static readonly string WarnStr = "[WARN]".Pastel("b58900");
+        private static readonly string ErrorStr = "[ERROR]".Pastel("dc322f");
+        private static readonly string DebugStr = "[DEBUG]".Pastel("2aa198");
 
-        private static readonly string infoStrP = "[INFO]";
-        private static readonly string warnStrP = "[WARN]";
-        private static readonly string errorStrP = "[ERROR]";
-        private static readonly string debugStrP = "[DEBUG]";
+        private const string InfoStrP = "[INFO]";
+        private const string WarnStrP = "[WARN]";
+        private const string ErrorStrP = "[ERROR]";
+        private const string DebugStrP = "[DEBUG]";
 
-        private static string logToWrite;
+        private static string _logToWrite;
 
-        private static string logFolder;
+        private static string _logFolder;
         public static string LogFolder
         {
             get
             {
-                if (logFolder == null)
+                if (_logFolder == null)
                 {
-                    logFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+                    _logFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
                 }
-                return logFolder;
+                return _logFolder;
             }
         }
-        public static string LogFile
-        {
-            get
-            {
-                return Path.Combine(LogFolder, $"serverLog_{DateTime.Today.ToString("yyyy-MM-dd")}.txt");
-            }
-        }
+        public static string LogFile => Path.Combine(LogFolder, $"Log_{DateTime.Today:yyyy-MM-dd}.txt");
 
         private static string GetTime(bool plain = false)
         {
@@ -58,40 +52,40 @@ namespace StreamLogger
 
         public static void Info(object str)
         {
-            string _str = $"({GetTime()}) {infoStr}:  {str}";
-            string _strP = $"({GetTime(true)}) {infoStrP}:  {str}";
+            string _str = $"({GetTime()}) {InfoStr}:  {str}";
+            string _strP = $"({GetTime(true)}) {InfoStrP}:  {str}";
             Console.WriteLine(_str);
             // ConsoleManager.WriteOut(_str, true);
-            logToWrite += _strP + Environment.NewLine;
+            _logToWrite += _strP + Environment.NewLine;
         }
 
         public static void Warn(object str)
         {
-            string _str = $"({GetTime()}) {warnStr}:  {str}";
-            string _strP = $"({GetTime(true)}) {warnStrP}:  {str}";
+            string _str = $"({GetTime()}) {WarnStr}:  {str}";
+            string _strP = $"({GetTime(true)}) {WarnStrP}:  {str}";
             Console.WriteLine(_str);
             // ConsoleManager.WriteOut(_str, true);
-            logToWrite += _strP + Environment.NewLine;
+            _logToWrite += _strP + Environment.NewLine;
         }
 
         public static void Error(object str)
         {
-            string _str = $"({GetTime()}) {errorStr}: {str}";
-            string _strP = $"({GetTime(true)}) {errorStrP}: {str}";
+            string _str = $"({GetTime()}) {ErrorStr}: {str}";
+            string _strP = $"({GetTime(true)}) {ErrorStrP}: {str}";
             Console.WriteLine(_str);
             // ConsoleManager.WriteOut(_str, true);
-            logToWrite += _strP + Environment.NewLine;
+            _logToWrite += _strP + Environment.NewLine;
         }
 
         public static void Debug(object str)
         {
             if (DebugMode)
             {
-                string _str = $"({GetTime()}) {debugStr}: {str}";
-                string _strP = $"({GetTime(true)}) {debugStrP}: {str}";
+                string _str = $"({GetTime()}) {DebugStr}: {str}";
+                string _strP = $"({GetTime(true)}) {DebugStrP}: {str}";
                 Console.WriteLine(_str);
                 // ConsoleManager.WriteOut(_str, true);
-                logToWrite += _strP + Environment.NewLine;
+                _logToWrite += _strP + Environment.NewLine;
             }
         }
 
@@ -102,7 +96,7 @@ namespace StreamLogger
 
         private static void _Animate(string[] strs, int delay, int repeat = 1)
         {
-            Console.Write($"({GetTime()}) {infoStr}:  ");
+            Console.Write($"({GetTime()}) {InfoStr}:  ");
             // ConsoleManager.WriteOut($"({GetTime()}) {infoStr}:  ", false);
 
             int cursorLeft = Console.CursorLeft;
@@ -144,14 +138,14 @@ namespace StreamLogger
             while (true)
             {
                 Thread.Sleep(2000);
-                if (!string.IsNullOrEmpty(logToWrite))
+                if (!string.IsNullOrEmpty(_logToWrite))
                 {
                     if (!Directory.Exists(LogFolder))
                     {
                         Directory.CreateDirectory(LogFolder);
                     }
-                    File.AppendAllText(LogFile, logToWrite);
-                    logToWrite = null;
+                    File.AppendAllText(LogFile, _logToWrite);
+                    _logToWrite = null;
                 }
             }
         }

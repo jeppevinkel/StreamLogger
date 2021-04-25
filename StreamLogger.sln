@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordIntegration", "Disco
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleIntegration", "ConsoleIntegration\ConsoleIntegration.csproj", "{716B7EF2-EBE5-4139-9B36-8CB7E64D423F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchImplementation", "TwitchImplementation\TwitchImplementation.csproj", "{8030A208-29A6-4903-A36B-08BD5B961A7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{716B7EF2-EBE5-4139-9B36-8CB7E64D423F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{716B7EF2-EBE5-4139-9B36-8CB7E64D423F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{716B7EF2-EBE5-4139-9B36-8CB7E64D423F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8030A208-29A6-4903-A36B-08BD5B961A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8030A208-29A6-4903-A36B-08BD5B961A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8030A208-29A6-4903-A36B-08BD5B961A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8030A208-29A6-4903-A36B-08BD5B961A7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

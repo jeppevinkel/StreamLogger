@@ -1,4 +1,5 @@
 ﻿using System;
+using Pastel;
 using StreamLogger;
 using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
@@ -28,10 +29,20 @@ namespace ConsoleIntegration
             {
                 badges += " ";
             }
-                    
-            var msg =
-                $"{meta} {badges}{e.Message.DisplayName}: {e.Message.MessageContent}";
-                    
+
+            string msg;
+            
+            if (e.Message.Flags.Contains("IsMe"))
+            {
+                msg =
+                    $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)} {e.Message.MessageContent.Pastel(e.Message.Color)}";
+            }
+            else
+            {
+                msg =
+                    $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)}: {e.Message.MessageContent}";
+            }
+
             Log.Info(msg);
         }
     }

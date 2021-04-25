@@ -9,7 +9,7 @@ namespace StreamLogger.Api.MessageTypes
         public string Color;
         public string DisplayName;
         public List<Emote> Emotes;
-        public string Flags;
+        public HashSet<string> Flags;
         public bool Mod;
         public bool Subscriber;
         public bool Broadcaster;
@@ -22,7 +22,7 @@ namespace StreamLogger.Api.MessageTypes
         public string Channel;
         public string MessageContent;
 
-        public ChatMessage(Dictionary<string, int> badges, string color, string displayName, List<Emote> emotes, string flags, bool mod, bool subscriber, bool broadcaster, long timestamp, string userType, string username, string channel, string messageContent)
+        public ChatMessage(Dictionary<string, int> badges, string color, string displayName, List<Emote> emotes, HashSet<string> flags, bool mod, bool subscriber, bool broadcaster, long timestamp, string userType, string username, string channel, string messageContent)
         {
             Badges = badges ?? new Dictionary<string, int>();
             Color = color;

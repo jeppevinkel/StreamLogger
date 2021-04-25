@@ -4,6 +4,7 @@ using System.Net;
 using StreamLogger;
 using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
+using StreamLogger.Api.MessageTypes.MiscData;
 
 namespace DiscordIntegration
 {
@@ -18,7 +19,7 @@ namespace DiscordIntegration
 
         private void ChatMessageEvent(object sender, ChatMessageEventArgs e)
         {
-            var meta = $"[{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
+            var meta = $"[#{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
 
             string modBadge = e.Message.Mod ? Config.Badges.ModeratorBadge : "";
             string broadcasterBadge = e.Message.Broadcaster ? Config.Badges.BroadcasterBadge : "";
@@ -29,10 +30,20 @@ namespace DiscordIntegration
             {
                 badges += " ";
             }
+
+            string msg;
             
-            var msg =
-                $"{meta} {badges} {e.Message.DisplayName}: {e.Message.MessageContent}";
-            
+            if (e.Message.Flags.Contains("IsMe"))
+            {
+                msg =
+                    $"{meta} {badges}***{e.Message.DisplayName}*** *{e.Message.MessageContent}*";
+            }
+            else
+            {
+                msg =
+                    $"{meta} {badges}{e.Message.DisplayName}: {e.Message.MessageContent}";
+            }
+
             SendDiscordWebhook(msg);
         }
 

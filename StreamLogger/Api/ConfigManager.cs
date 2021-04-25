@@ -89,6 +89,31 @@ namespace StreamLogger.Api
                     }
                 }
 
+                foreach (IImplementation<IConfig> implementation in IntegrationLoader.Implementations)
+                {
+                    if (!rawDeserializedConfigs.TryGetValue(implementation.Prefix, out rawDeserializedConfig))
+                    {
+                        Log.Warn($"{implementation.Name} doesn't have default configs, generating...");
+
+                        deserializedConfigs.Add(implementation.Prefix, implementation.Config);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            deserializedConfigs.Add(implementation.Prefix, (IConfig)Deserializer.Deserialize(Serializer.Serialize(rawDeserializedConfig), implementation.Config.GetType()));
+
+                            implementation.Config.CopyProperties(deserializedConfigs[implementation.Prefix]);
+                        }
+                        catch (YamlException yamlException)
+                        {
+                            Log.Error($"{implementation.Name} configs could not be loaded, some of them are in a wrong format, default configs will be loaded instead! {yamlException}");
+
+                            deserializedConfigs.Add(implementation.Prefix, implementation.Config);
+                        }
+                    }
+                }
+
                 Log.Info("Configs loaded successfully!");
 
                 return deserializedConfigs;
