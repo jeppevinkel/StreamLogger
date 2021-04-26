@@ -23,10 +23,13 @@ namespace TwitchImplementation.TwitchBot.Client.Models
 
         public readonly Dictionary<string, string> Tags;
 
+        public readonly string RawIrc;
+
         public IrcMessage(IrcCommand command,
             string[] parameters,
             string hostmask,
-            Dictionary<string, string> tags = null)
+            Dictionary<string, string> tags,
+            string rawIrc)
         {
             var idx = hostmask.IndexOf('!');
             User = idx != -1 ? hostmask.Substring(0, idx) : hostmask;
@@ -34,6 +37,7 @@ namespace TwitchImplementation.TwitchBot.Client.Models
             _parameters = parameters;
             Command = command;
             Tags = tags;
+            RawIrc = rawIrc;
         }
     }
 }

@@ -109,44 +109,8 @@ namespace TwitchImplementation.TwitchBot
                 }
 
                 IrcMessage ircMessage = IrcParser.ParseIrcMessage(line);
-                if (ircMessage.Command == IrcCommand.PrivMsg)
-                {
-                    ChatMessage chatMessage = new ChatMessage(ircMessage);
-
-                    DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(chatMessage.TmiSentTs));
-
-                    HashSet<string> flags = new HashSet<string>();
-
-                    if (chatMessage.IsMe)
-                    {
-                        flags.Add("IsMe");
-                    }
-
-                    StreamLogger.Api.MessageTypes.ChatMessage chatMsg = new StreamLogger.Api.MessageTypes.ChatMessage(
-                        chatMessage.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
-                        chatMessage.Color,
-                        chatMessage.DisplayName,
-                        chatMessage.Emotes.ConvertAll(input => new Emote(input.Id,
-                            input.StartIndex,
-                            input.EndIndex,
-                            input.Name,
-                            input.ImageUrl)),
-                        flags,
-                        chatMessage.IsModerator,
-                        chatMessage.IsSubscriber,
-                        chatMessage.IsBroadcaster,
-                        dto.ToUnixTimeSeconds(),
-                        chatMessage.UserType,
-                        chatMessage.Username,
-                        chatMessage.Channel,
-                        chatMessage.Message);
-
-                    ChatMessageEventArgs messageEventArgs = new ChatMessageEventArgs(chatMsg);
-                    EventManager.OnRaiseChatMessageEvent(messageEventArgs);
-                }
+                IrcHandler.HandleIrc(ircMessage);
             }
-            
-            
         }
         
         //Outside of start we need to define ValidateServerCertificate

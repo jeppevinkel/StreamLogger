@@ -124,7 +124,7 @@ namespace TwitchImplementation.TwitchBot.Client
                 lens[(int)State.StateTrailing]);
             string hostMask = raw.Substring(starts[(int)State.StatePrefix],
                 lens[(int)State.StatePrefix]);
-            return new IrcMessage(command, new[] { parameters, message }, hostMask, tagDictionary);
+            return new IrcMessage(command, new[] { parameters, message }, hostMask, tagDictionary, raw);
         }
         
         

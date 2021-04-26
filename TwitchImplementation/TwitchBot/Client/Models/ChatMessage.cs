@@ -40,6 +40,7 @@ namespace TwitchImplementation.TwitchBot.Client.Models
             Message = ircMessage.Message;
             Channel = ircMessage.Channel;
             Username = ircMessage.User;
+            RawMessage = ircMessage.RawIrc;
 
             foreach (KeyValuePair<string, string> tag in ircMessage.Tags)
             {
@@ -149,6 +150,9 @@ namespace TwitchImplementation.TwitchBot.Client.Models
                         break;
                 }
             }
+            
+            if (string.IsNullOrEmpty(DisplayName))
+                DisplayName = Username;
 
             if (Message.Length > 0 && (byte)Message[0] == 1 && (byte)Message[^1] == 1)
             {
@@ -162,6 +166,13 @@ namespace TwitchImplementation.TwitchBot.Client.Models
             if (string.Equals(Channel, Username, StringComparison.InvariantCultureIgnoreCase))
             {
                 IsBroadcaster = true;
+            }
+            if (Channel.Split(':').Length == 3)
+            {
+                if (string.Equals(Channel.Split(':')[1], UserId, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    IsBroadcaster = true;
+                }
             }
         }
     }

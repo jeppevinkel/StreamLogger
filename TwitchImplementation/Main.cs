@@ -12,7 +12,7 @@ namespace TwitchImplementation
         {
             base.Init();
 
-            _client = new TwitchClient("jopodev", "9fq1sbem8tokz6bjwsa2duj43n2x08");
+            _client = new TwitchClient("jopodev", "hop7uuvwqdzlr4hlc0p9ogsz0i83oe");
             _client.JoinChannels(Config.Channels);
         }
     }
