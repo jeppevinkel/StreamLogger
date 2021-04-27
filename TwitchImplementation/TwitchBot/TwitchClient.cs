@@ -100,7 +100,7 @@ namespace TwitchImplementation.TwitchBot
 
                 Log.Debug(line);
                         
-                string[] split = line.Split(" ");
+                string[] split = line.Split(' ');
                 //PING :tmi.twitch.tv
                 //Respond with PONG :tmi.twitch.tv
                 if (line.StartsWith("PING"))

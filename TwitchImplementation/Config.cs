@@ -8,5 +8,8 @@ namespace TwitchImplementation
         public bool Enabled { get; set; } = false;
 
         public List<string> Channels { get; set; } = new List<string>();
+
+        public string Username { get; set; }
+        public string OAuthToken { get; set; }
     }
 }

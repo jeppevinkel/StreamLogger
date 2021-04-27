@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
-using StreamLogger.Api;
-using StreamLogger.Api.EventArgs;
-using StreamLogger.Api.MessageTypes;
 using StreamLogger.Loader;
 
 namespace StreamLogger
@@ -16,38 +15,44 @@ namespace StreamLogger
         static void Main(string[] args)
         {
             LogWriter = Task.Run(Log.WriteLog);
+            AppDomain.CurrentDomain.AssemblyResolve += 
+                CurrentDomain_AssemblyResolve;
+            
             IntegrationLoader.Run();
             
-            // ChatMessage testMessageRando = new ChatMessage();
-            // testMessageRando.Channel = "#jeppevinkel";
-            // testMessageRando.DisplayName = "RandoDude123";
-            // testMessageRando.MessageContent = "This is a test message from a rando!";
-            // testMessageRando.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            //
-            // ChatMessage testMessageMod = new ChatMessage();
-            // testMessageMod.Channel = "#jeppevinkel";
-            // testMessageMod.DisplayName = "BOLL7708";
-            // testMessageMod.MessageContent = "This is a test message from a moderator!";
-            // testMessageMod.Mod = true;
-            // testMessageMod.Subscriber = true;
-            // testMessageMod.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            //
-            // ChatMessage testMessageBroadcaster = new ChatMessage();
-            // testMessageBroadcaster.Channel = "#jeppevinkel";
-            // testMessageBroadcaster.DisplayName = "Jeppevinkel";
-            // testMessageBroadcaster.MessageContent = "This is a test message from the broadcaster!";
-            // testMessageBroadcaster.Mod = true;
-            // testMessageBroadcaster.Broadcaster = true;
-            // testMessageBroadcaster.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            //
-            // EventManager.OnRaiseChatMessageEvent(new ChatMessageEventArgs(testMessageRando));
-            // EventManager.OnRaiseChatMessageEvent(new ChatMessageEventArgs(testMessageMod));
-            // EventManager.OnRaiseChatMessageEvent(new ChatMessageEventArgs(testMessageBroadcaster));
-
-            // Log.Debug(ConfigManager.GetInfo());
-            // Log.Debug(ConfigManager.cfg.TestConfig);
-
             Console.ReadLine();
+        }
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            // Ignore missing resources
+            if (args.Name.Contains(".resources"))
+                return null;
+
+            // check for assemblies already loaded
+            Assembly assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == args.Name);
+            if (assembly != null)
+            {
+                Log.Debug($"Assembly found in CurrentDomain: {assembly.FullName}");
+                return assembly;
+            }
+
+            // Try to load by filename - split out the filename of the full assembly name
+            // and append the base path of the original assembly (ie. look in the same dir)
+            string filename = args.Name.Split(',')[0] + ".dll".ToLower();
+
+            string asmFile = Path.Combine(@".\","Dependencies",filename);
+    
+            try
+            {
+                Log.Debug($"Assembly loaded from dependencies folder: {assembly.FullName}");
+                return Assembly.LoadFrom(asmFile);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                return null;
+            }
         }
     }
 }

@@ -99,7 +99,7 @@ namespace StreamLogger.Loader
 
             foreach (Assembly assembly in Locations.Keys)
             {
-                if (Locations[assembly].Contains("Dependencies"))
+                if (!Locations[assembly].Contains(Paths.Integrations))
                     continue;
 
                 IIntegration<IConfig> integration = CreateIntegration(assembly);
@@ -128,7 +128,7 @@ namespace StreamLogger.Loader
 
             foreach (Assembly assembly in Locations.Keys)
             {
-                if (Locations[assembly].Contains("Dependencies"))
+                if (!Locations[assembly].Contains(Paths.Implementations))
                     continue;
 
                 IImplementation<IConfig> implementation = CreateImplementation(assembly);
