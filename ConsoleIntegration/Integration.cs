@@ -14,9 +14,12 @@ namespace ConsoleIntegration
             base.Init();
 
             EventManager.ChatMessageEvent += ChatMessageEvent;
+            EventManager.ChatMessageWithRewardEvent += ChatMessageWithRewardEvent;
             EventManager.HostNotificationEvent += HostNotificationEvent;
             EventManager.HostingStartedEvent += HostingStartedEvent;
             EventManager.HostingStoppedEvent += HostingStoppedEvent;
+            EventManager.NewSubscriptionEvent += NewSubscriptionEvent;
+            EventManager.ReSubscriptionEvent += ReSubscriptionEvent;
         }
 
         private void ChatMessageEvent(object sender, ChatMessageEventArgs e)
@@ -45,6 +48,28 @@ namespace ConsoleIntegration
                 msg =
                     $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)}: {e.Message.MessageContent}";
             }
+
+            Log.Info(msg);
+        }
+
+        private void ChatMessageWithRewardEvent(object sender, ChatMessageWithRewardEventArgs e)
+        {
+            var meta = $"[{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
+        
+            string modBadge = e.Message.Mod ? "[MOD]" : "";
+            string broadcasterBadge = e.Message.Broadcaster ? "[BROADCASTER]" : "";
+            string subscriberBadge = e.Message.Subscriber ? "[SUB]" : "";
+
+            var badges = $"{subscriberBadge}{modBadge}{broadcasterBadge}";
+            if (badges.Length != 0)
+            {
+                badges += " ";
+            }
+
+            string msg;
+
+            msg =
+                $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)}: {e.Message.MessageContent} ({e.Message.RewardId})";
 
             Log.Info(msg);
         }
@@ -89,6 +114,48 @@ namespace ConsoleIntegration
 
             msg =
                 $"{meta} No longer hosting with {e.HostingStopped.Viewers} viewers.";
+
+            Log.Info(msg);
+        }
+
+        private void ReSubscriptionEvent(object sender, ReSubscriptionEventArgs e)
+        {
+            var meta = $"[{e.Subscription.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Subscription.Timestamp).ToLocalTime():HH:mm}]";
+        
+            string modBadge = e.Subscription.Mod ? "[MOD]" : "";
+            string subscriberBadge = e.Subscription.Subscriber ? "[SUB]" : "";
+
+            var badges = $"{subscriberBadge}{modBadge}";
+            if (badges.Length != 0)
+            {
+                badges += " ";
+            }
+
+            string msg;
+
+            msg =
+                $"{meta} {e.Subscription.SystemMessage} with the following message: {e.Subscription.MessageContent}";
+
+            Log.Info(msg);
+        }
+
+        private void NewSubscriptionEvent(object sender, NewSubscriptionEventArgs e)
+        {
+            var meta = $"[{e.Subscription.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Subscription.Timestamp).ToLocalTime():HH:mm}]";
+        
+            string modBadge = e.Subscription.Mod ? "[MOD]" : "";
+            string subscriberBadge = e.Subscription.Subscriber ? "[SUB]" : "";
+
+            var badges = $"{subscriberBadge}{modBadge}";
+            if (badges.Length != 0)
+            {
+                badges += " ";
+            }
+
+            string msg;
+
+            msg =
+                $"{meta} {e.Subscription.SystemMessage} with the following message: {e.Subscription.MessageContent}";
 
             Log.Info(msg);
         }

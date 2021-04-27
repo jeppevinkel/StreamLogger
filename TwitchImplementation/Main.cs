@@ -6,6 +6,7 @@ using StreamLogger;
 using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
 using StreamLogger.Api.MessageTypes;
+using StreamLogger.Api.MessageTypes.MiscData;
 using TwitchImplementation.TwitchBot.Auth;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -59,6 +60,7 @@ namespace TwitchImplementation
             client.OnMessageReceived += Client_OnMessageReceived;
             client.OnWhisperReceived += Client_OnWhisperReceived;
             client.OnNewSubscriber += Client_OnNewSubscriber;
+            client.OnReSubscriber += Client_OnReSubscriber;
             client.OnConnected += Client_OnConnected;
             client.OnHostingStarted += Client_OnHostingStarted;
             client.OnHostingStopped += Client_OnHostingStopped;
@@ -95,6 +97,34 @@ namespace TwitchImplementation
             if (e.ChatMessage.IsMe)
             {
                 flags.Add("IsMe");
+            }
+
+            if (!string.IsNullOrWhiteSpace(e.ChatMessage.CustomRewardId))
+            {
+                ChatMessageWithReward chatMsgWithRewards = new ChatMessageWithReward(
+                    e.ChatMessage.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
+                    e.ChatMessage.ColorHex,
+                    e.ChatMessage.DisplayName,
+                    e.ChatMessage.EmoteSet.Emotes.ConvertAll(input => new StreamLogger.Api.MessageTypes.MiscData.Emote(
+                        input.Id,
+                        input.StartIndex,
+                        input.EndIndex,
+                        input.Name,
+                        input.ImageUrl)),
+                    flags,
+                    e.ChatMessage.IsModerator,
+                    e.ChatMessage.IsSubscriber,
+                    e.ChatMessage.IsBroadcaster,
+                    dto.ToUnixTimeSeconds(),
+                    e.ChatMessage.UserType.ToString(),
+                    e.ChatMessage.Username,
+                    e.ChatMessage.Channel,
+                    e.ChatMessage.Message,
+                    e.ChatMessage.CustomRewardId);
+                
+                ChatMessageWithRewardEventArgs messageWithRewatdEventArgs = new ChatMessageWithRewardEventArgs(chatMsgWithRewards);
+                EventManager.OnChatMessageWithRewardEvent(messageWithRewatdEventArgs);
+                return;
             }
                 
             StreamLogger.Api.MessageTypes.ChatMessage chatMsg = new StreamLogger.Api.MessageTypes.ChatMessage(
@@ -161,10 +191,96 @@ namespace TwitchImplementation
         
         private void Client_OnNewSubscriber(object sender, OnNewSubscriberArgs e)
         {
-            // if (e.Subscriber.SubscriptionPlan == SubscriptionPlan.Prime)
-            //     client.SendMessage(e.Channel, $"Welcome {e.Subscriber.DisplayName} to the substers! You just earned 500 points! So kind of you to use your Twitch Prime on this channel!");
-            // else
-            //     client.SendMessage(e.Channel, $"Welcome {e.Subscriber.DisplayName} to the substers! You just earned 500 points!");
+            DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(e.Subscriber.TmiSentTs));
+
+            HashSet<string> flags = new HashSet<string>();
+
+            SubscriptionPlan subPlan = SubscriptionPlan.NotSet;
+
+            subPlan = e.Subscriber.SubscriptionPlan switch
+            {
+                TwitchLib.Client.Enums.SubscriptionPlan.NotSet => SubscriptionPlan.NotSet,
+                TwitchLib.Client.Enums.SubscriptionPlan.Prime => SubscriptionPlan.Prime,
+                TwitchLib.Client.Enums.SubscriptionPlan.Tier1 => SubscriptionPlan.Tier1,
+                TwitchLib.Client.Enums.SubscriptionPlan.Tier2 => SubscriptionPlan.Tier2,
+                TwitchLib.Client.Enums.SubscriptionPlan.Tier3 => SubscriptionPlan.Tier3,
+                _ => subPlan
+            };
+
+            Subscription subscription = new Subscription(
+                e.Subscriber.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
+                e.Subscriber.ColorHex,
+                e.Subscriber.DisplayName,
+                new EmoteSet(e.Subscriber.EmoteSet, e.Subscriber.ResubMessage).Emotes.ConvertAll(input =>
+                    new StreamLogger.Api.MessageTypes.MiscData.Emote(input.Id,
+                        input.StartIndex,
+                        input.EndIndex,
+                        input.Name,
+                        input.ImageUrl)),
+                flags,
+                e.Subscriber.IsModerator,
+                e.Subscriber.IsSubscriber,
+                dto.ToUnixTimeSeconds(),
+                e.Subscriber.UserType.ToString(),
+                e.Subscriber.Login,
+                e.Channel,
+                e.Subscriber.ResubMessage,
+                subPlan,
+                e.Subscriber.SubscriptionPlanName,
+                int.Parse(e.Subscriber.MsgParamCumulativeMonths),
+                e.Subscriber.MsgParamShouldShareStreak,
+                int.Parse(e.Subscriber.MsgParamStreakMonths),
+                e.Subscriber.SystemMessageParsed);
+            
+            NewSubscriptionEventArgs newSubscriptionEventArgs = new NewSubscriptionEventArgs(subscription);
+            EventManager.OnNewSubscriptionEvent(newSubscriptionEventArgs);
+        }
+        
+        private void Client_OnReSubscriber(object sender, OnReSubscriberArgs e)
+        {
+            DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(e.ReSubscriber.TmiSentTs));
+
+            HashSet<string> flags = new HashSet<string>();
+
+            SubscriptionPlan subPlan = SubscriptionPlan.NotSet;
+
+            subPlan = e.ReSubscriber.SubscriptionPlan switch
+            {
+                TwitchLib.Client.Enums.SubscriptionPlan.NotSet => SubscriptionPlan.NotSet,
+                TwitchLib.Client.Enums.SubscriptionPlan.Prime => SubscriptionPlan.Prime,
+                TwitchLib.Client.Enums.SubscriptionPlan.Tier1 => SubscriptionPlan.Tier1,
+                TwitchLib.Client.Enums.SubscriptionPlan.Tier2 => SubscriptionPlan.Tier2,
+                TwitchLib.Client.Enums.SubscriptionPlan.Tier3 => SubscriptionPlan.Tier3,
+                _ => subPlan
+            };
+
+            Subscription subscription = new Subscription(
+                e.ReSubscriber.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
+                e.ReSubscriber.ColorHex,
+                e.ReSubscriber.DisplayName,
+                new EmoteSet(e.ReSubscriber.EmoteSet, e.ReSubscriber.ResubMessage).Emotes.ConvertAll(input =>
+                    new StreamLogger.Api.MessageTypes.MiscData.Emote(input.Id,
+                        input.StartIndex,
+                        input.EndIndex,
+                        input.Name,
+                        input.ImageUrl)),
+                flags,
+                e.ReSubscriber.IsModerator,
+                e.ReSubscriber.IsSubscriber,
+                dto.ToUnixTimeSeconds(),
+                e.ReSubscriber.UserType.ToString(),
+                e.ReSubscriber.Login,
+                e.Channel,
+                e.ReSubscriber.ResubMessage,
+                subPlan,
+                e.ReSubscriber.SubscriptionPlanName,
+                int.Parse(e.ReSubscriber.MsgParamCumulativeMonths),
+                e.ReSubscriber.MsgParamShouldShareStreak,
+                int.Parse(e.ReSubscriber.MsgParamStreakMonths),
+                e.ReSubscriber.SystemMessageParsed);
+            
+            ReSubscriptionEventArgs reSubscriptionEventArgs = new ReSubscriptionEventArgs(subscription);
+            EventManager.OnReSubscriptionEvent(reSubscriptionEventArgs);
         }
     }
 }

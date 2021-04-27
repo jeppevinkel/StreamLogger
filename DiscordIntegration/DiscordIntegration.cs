@@ -16,6 +16,8 @@ namespace DiscordIntegration
 
             if (Config.Events.ChatMessage)
                 EventManager.ChatMessageEvent += ChatMessageEvent;
+            if (Config.Events.ChatMessage)
+                EventManager.ChatMessageWithRewardEvent += ChatMessageWithRewardEvent;
             if (Config.Events.HostNotification)
                 EventManager.HostNotificationEvent += HostNotificationEvent;
             if (Config.Events.HostingStarted)
@@ -50,6 +52,28 @@ namespace DiscordIntegration
                 msg =
                     $"{meta} {badges}{e.Message.DisplayName}: {e.Message.MessageContent}";
             }
+
+            SendDiscordWebhook(msg);
+        }
+
+        private void ChatMessageWithRewardEvent(object sender, ChatMessageWithRewardEventArgs e)
+        {
+            var meta = $"[#{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
+
+            string modBadge = e.Message.Mod ? Config.Badges.ModeratorBadge : "";
+            string broadcasterBadge = e.Message.Broadcaster ? Config.Badges.BroadcasterBadge : "";
+            string subscriberBadge = e.Message.Subscriber ? Config.Badges.SubscriberBadge : "";
+            
+            var badges = $"{subscriberBadge}{modBadge}{broadcasterBadge}";
+            if (badges.Length != 0)
+            {
+                badges += " ";
+            }
+
+            string msg;
+
+            msg =
+                $"{meta} {badges}{e.Message.DisplayName}: {e.Message.MessageContent} ({e.Message.RewardId})";
 
             SendDiscordWebhook(msg);
         }
