@@ -10,6 +10,7 @@ namespace TwitchImplementation
         public List<string> Channels { get; set; } = new List<string>();
 
         public string Username { get; set; }
-        public string OAuthToken { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
     }
 }

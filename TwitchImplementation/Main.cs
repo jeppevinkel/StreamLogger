@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using StreamLogger;
 using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
 using StreamLogger.Api.MessageTypes;
+using TwitchImplementation.TwitchBot.Auth;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -17,27 +19,32 @@ namespace TwitchImplementation
     {
         // private TwitchClient _client;
         Bot _bot;
+        internal static readonly HttpClient client = new HttpClient();
+        private static Main singleton = new Main();
+
+        private Main()
+        {
+        }
+        public static Main Instance => singleton;
 
         public override void Init()
         {
             base.Init();
-            
-            _bot = new Bot(this);
 
-            // _client = new TwitchClient("jopodev", "hop7uuvwqdzlr4hlc0p9ogsz0i83oe");
-            // _client.JoinChannels(Config.Channels).ConfigureAwait(false);
+            if (AuthenticationManager.Authenticate())
+            {
+                _bot = new Bot();
+            }
         }
     }
 
     internal class Bot
     {
         readonly TwitchClient client;
-        private readonly Main Main;
 	
-        public Bot(Main main)
+        public Bot()
         {
-            Main = main;
-            var credentials = new ConnectionCredentials(Main.Config.Username, Main.Config.OAuthToken);
+            var credentials = new ConnectionCredentials(Main.Instance.Config.Username, AuthenticationManager.TokenData.AccessToken);
             var clientOptions = new ClientOptions
             {
                 MessagesAllowedInPeriod = 750,
@@ -45,7 +52,7 @@ namespace TwitchImplementation
             };
             var customClient = new WebSocketClient(clientOptions);
             client = new TwitchClient(customClient);
-            client.Initialize(credentials, Main.Config.Channels[0]);
+            client.Initialize(credentials, Main.Instance.Config.Channels[0]);
 
             client.OnLog += Client_OnLog;
             client.OnJoinedChannel += Client_OnJoinedChannel;
@@ -68,7 +75,7 @@ namespace TwitchImplementation
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
             Log.Info($"Connected to Twitch {e.AutoJoinChannel}");
-            foreach (string channel in Main.Config.Channels.Skip(1))
+            foreach (string channel in Main.Instance.Config.Channels.Skip(1))
             {
                 client.JoinChannel(channel);
             }
