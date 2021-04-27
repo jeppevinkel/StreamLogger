@@ -36,6 +36,11 @@ namespace TwitchImplementation
             {
                 _bot = new Bot();
             }
+            else
+            {
+                Log.Warn("Failed to validate access token. Signing in anonymously.");
+                _bot = new Bot(true);
+            }
         }
     }
 
@@ -43,9 +48,12 @@ namespace TwitchImplementation
     {
         readonly TwitchClient client;
 	
-        public Bot()
+        public Bot(bool anonymous = false)
         {
-            var credentials = new ConnectionCredentials(Main.Instance.Config.Username, AuthenticationManager.TokenData.AccessToken);
+            ConnectionCredentials credentials = anonymous
+                ? new ConnectionCredentials("justinfan123", "justinfan123")
+                : new ConnectionCredentials(Main.Instance.Config.Username, AuthenticationManager.TokenData.AccessToken);
+            
             var clientOptions = new ClientOptions
             {
                 MessagesAllowedInPeriod = 750,

@@ -88,8 +88,8 @@ namespace TwitchImplementation.TwitchBot.Auth
             var response = Main.client.GetAsync("https://id.twitch.tv/oauth2/validate").Result;
 
             var responseString = response.Content.ReadAsStringAsync().Result;
-
-            return !responseString.Contains("invalid access token");
+            
+            return !responseString.Contains("\"status\":401");
         }
 
         public static TokenData ReadTokenData()
