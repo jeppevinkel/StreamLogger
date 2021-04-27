@@ -13,11 +13,15 @@ namespace DiscordIntegration
         public override void Init()
         {
             base.Init();
-        
-            EventManager.ChatMessageEvent += ChatMessageEvent;
-            EventManager.HostNotificationEvent += HostNotificationEvent;
-            EventManager.HostingStartedEvent += HostingStartedEvent;
-            EventManager.HostingStoppedEvent += HostingStoppedEvent;
+
+            if (Config.Events.ChatMessage)
+                EventManager.ChatMessageEvent += ChatMessageEvent;
+            if (Config.Events.HostNotification)
+                EventManager.HostNotificationEvent += HostNotificationEvent;
+            if (Config.Events.HostingStarted)
+                EventManager.HostingStartedEvent += HostingStartedEvent;
+            if (Config.Events.HostingStopped)
+                EventManager.HostingStoppedEvent += HostingStoppedEvent;
         }
 
         private void ChatMessageEvent(object sender, ChatMessageEventArgs e)
