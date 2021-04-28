@@ -37,17 +37,15 @@ namespace TwitchImplementation.TwitchBot.Auth
             DateTimeOffset expiry = DateTimeOffset.FromUnixTimeSeconds(TokenData.Expiry);
             bool expired = expiry.CompareTo(DateTimeOffset.UtcNow) <= 0;
 
-            if (expired)
+            if (!expired) return ValidateTokenData();
+            Log.Warn("The access token was expired, so I'm requesting a refresh from Twitch.");
+            try
             {
-                Log.Warn("The access token was expired, so I'm requesting a refresh from Twitch.");
-                try
-                {
-                    RefreshToken();
-                }
-                catch (Exception e)
-                {
-                    Log.Error(e);
-                }
+                RefreshToken();
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
             }
 
             return ValidateTokenData();
@@ -85,6 +83,7 @@ namespace TwitchImplementation.TwitchBot.Auth
 
         public static bool ValidateTokenData()
         {
+            Main.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", TokenData.AccessToken);
             var response = Main.client.GetAsync("https://id.twitch.tv/oauth2/validate").Result;
 
             var responseString = response.Content.ReadAsStringAsync().Result;
@@ -117,8 +116,7 @@ namespace TwitchImplementation.TwitchBot.Auth
                 SaveTokenData(tokenData);
                 Log.Warn("TokenData is in invalid format. Returning empty object.");
             }
-
-            Main.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", tokenData.AccessToken);
+            
             return tokenData;
         }
 

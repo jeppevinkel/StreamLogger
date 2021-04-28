@@ -13,6 +13,9 @@ using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
+using TwitchLib.PubSub;
+using TwitchLib.PubSub.Events;
+using OnLogArgs = TwitchLib.Client.Events.OnLogArgs;
 
 namespace TwitchImplementation
 {
@@ -46,10 +49,14 @@ namespace TwitchImplementation
 
     internal class Bot
     {
-        readonly TwitchClient client;
+        private readonly TwitchClient _client;
+        private readonly TwitchPubSub _pubsub;
+        private readonly bool _anonymous = false;
 	
         public Bot(bool anonymous = false)
         {
+            _anonymous = anonymous;
+            
             ConnectionCredentials credentials = anonymous
                 ? new ConnectionCredentials("justinfan123", "justinfan123")
                 : new ConnectionCredentials(Main.Instance.Config.Username, AuthenticationManager.TokenData.AccessToken);
@@ -60,21 +67,33 @@ namespace TwitchImplementation
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)
             };
             var customClient = new WebSocketClient(clientOptions);
-            client = new TwitchClient(customClient);
-            client.Initialize(credentials, Main.Instance.Config.Channels[0]);
+            _client = new TwitchClient(customClient);
+            _client.Initialize(credentials, Main.Instance.Config.Channels[0]);
 
-            client.OnLog += Client_OnLog;
-            client.OnJoinedChannel += Client_OnJoinedChannel;
-            client.OnMessageReceived += Client_OnMessageReceived;
-            client.OnWhisperReceived += Client_OnWhisperReceived;
-            client.OnNewSubscriber += Client_OnNewSubscriber;
-            client.OnReSubscriber += Client_OnReSubscriber;
-            client.OnConnected += Client_OnConnected;
-            client.OnHostingStarted += Client_OnHostingStarted;
-            client.OnHostingStopped += Client_OnHostingStopped;
-            client.OnBeingHosted += Client_OnBeingHosted;
+            _pubsub = new TwitchPubSub();
+            
+            _pubsub.OnLog += PubSub_OnLog;
+            _pubsub.OnRewardRedeemed += PubSub_OnRewardRedeemed;
+            _pubsub.OnPubSubServiceConnected += PubSub_OnPubSubServiceConnected;
+            _pubsub.OnPubSubServiceError += PubSub_OnPubSubServiceError;
+            _pubsub.OnListenResponse += PubSub_onListenResponse;
+            
+            _pubsub.ListenToRewards("47214265");
+            
+            _pubsub.Connect();
 
-            client.Connect();
+            _client.OnLog += Client_OnLog;
+            _client.OnJoinedChannel += Client_OnJoinedChannel;
+            _client.OnMessageReceived += Client_OnMessageReceived;
+            _client.OnWhisperReceived += Client_OnWhisperReceived;
+            _client.OnNewSubscriber += Client_OnNewSubscriber;
+            _client.OnReSubscriber += Client_OnReSubscriber;
+            _client.OnConnected += Client_OnConnected;
+            _client.OnHostingStarted += Client_OnHostingStarted;
+            _client.OnHostingStopped += Client_OnHostingStopped;
+            _client.OnBeingHosted += Client_OnBeingHosted;
+
+            _client.Connect();
         }
   
         private void Client_OnLog(object sender, OnLogArgs e)
@@ -82,12 +101,52 @@ namespace TwitchImplementation
             Log.Debug($"{e.BotUsername} - {e.Data}");
         }
   
+        private void PubSub_OnLog(object sender, TwitchLib.PubSub.Events.OnLogArgs e)
+        {
+            Log.Debug($"[PubSub] {e.Data}");
+        }
+  
+        private void PubSub_OnPubSubServiceError(object sender, OnPubSubServiceErrorArgs e)
+        {
+            Log.Error($"[PubSub] {e.Exception}");
+        }
+  
+        private void PubSub_OnRewardRedeemed(object sender, OnRewardRedeemedArgs e)
+        {
+            Log.Debug($"[PubSub] {e.DisplayName} just redeemed {e.RewardTitle} with message: {e.Message}");
+        }
+
+        private void PubSub_OnPubSubServiceConnected(object sender, EventArgs e)
+        {
+            Log.Info("[PubSub] Service connected.");
+            if (_anonymous)
+            {
+                _pubsub.SendTopics();
+            }
+            else
+            {
+                _pubsub.SendTopics(AuthenticationManager.TokenData.AccessToken);
+            }
+        }
+        
+        private void PubSub_onListenResponse(object sender, OnListenResponseArgs e)
+        {
+            if (!e.Successful)
+            {
+                Log.Error($"[PubSub] Failed to listen to {e.Topic}! Response: {e.Response}");
+            }
+            else
+            {
+                Log.Info($"[PubSub] Now listening to {e.Topic}");
+            }
+        }
+  
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
             Log.Info($"Connected to Twitch {e.AutoJoinChannel}");
             foreach (string channel in Main.Instance.Config.Channels.Skip(1))
             {
-                client.JoinChannel(channel);
+                _client.JoinChannel(channel);
             }
         }
   
