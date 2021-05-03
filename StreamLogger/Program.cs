@@ -45,8 +45,9 @@ namespace StreamLogger
     
             try
             {
+                assembly = Assembly.LoadFrom(asmFile);
                 Log.Debug($"Assembly loaded from dependencies folder: {assembly.FullName}");
-                return Assembly.LoadFrom(asmFile);
+                return assembly;
             }
             catch (Exception ex)
             {

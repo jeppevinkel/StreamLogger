@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\StreamLogger\StreamLogger.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="LibVLCSharp" Version="3.5.0" />
+      <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.12" />
+    </ItemGroup>
+
+    <Target Name="CopyBinaryFiles" AfterTargets="Build">
+        <Message Importance="high" Text="Copying assembly to Integrations folder..." />
+        <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(ProjectDir)..\StreamLogger\$(OutputPath)Integrations" ContinueOnError="true" />
+    </Target>
+
+</Project>
