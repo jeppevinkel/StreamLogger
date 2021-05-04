@@ -96,5 +96,22 @@ namespace StreamLogger.Api
                 }
             }
         }
+
+        public static void InvokeSafely(this CustomEventHandler eventHandler)
+        {
+            CustomEventHandler raiseEvent = eventHandler;
+
+            foreach (CustomEventHandler handler in raiseEvent.GetInvocationList())
+            {
+                try
+                {
+                    handler();
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Error while handling {raiseEvent?.Method.Name} in {handler.Method.ReflectedType?.FullName}: {e}");
+                }
+            }
+        }
     }
 }
