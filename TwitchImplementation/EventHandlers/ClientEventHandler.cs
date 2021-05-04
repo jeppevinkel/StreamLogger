@@ -14,6 +14,12 @@ namespace TwitchImplementation.EventHandlers
 {
     public static class ClientEventHandler
     {
+        public static string[] DefaultColors =
+        {
+            "#1E90FF",
+            "#FF69B4"
+        };
+        
         public static void OnLog(object sender, OnLogArgs e)
         {
             Log.Debug($"{e.BotUsername} - {e.Data}");
@@ -36,20 +42,57 @@ namespace TwitchImplementation.EventHandlers
 
         public static void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(e.ChatMessage.TmiSentTs));
-
-            HashSet<string> flags = new HashSet<string>();
-
-            if (e.ChatMessage.IsMe)
+            try
             {
-                flags.Add("IsMe");
-            }
+                DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(e.ChatMessage.TmiSentTs));
 
-            if (!string.IsNullOrWhiteSpace(e.ChatMessage.CustomRewardId))
-            {
-                ChatMessageWithReward chatMsgWithRewards = new ChatMessageWithReward(
+                HashSet<string> flags = new HashSet<string>();
+
+                if (e.ChatMessage.IsMe)
+                {
+                    flags.Add("IsMe");
+                }
+
+                string colorHex = e.ChatMessage.ColorHex;
+
+                // if (string.IsNullOrEmpty(colorHex))
+                // {
+                //     colorHex = DefaultColors[StreamLogger.Loader.IntegrationLoader.Random.Next(DefaultColors.Length)];
+                // }
+
+                if (!string.IsNullOrWhiteSpace(e.ChatMessage.CustomRewardId))
+                {
+                    ChatMessageWithReward chatMsgWithRewards = new ChatMessageWithReward(
+                        e.ChatMessage.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
+                        colorHex,
+                        e.ChatMessage.DisplayName,
+                        e.ChatMessage.EmoteSet.Emotes.ConvertAll(input =>
+                            new StreamLogger.Api.MessageTypes.MiscData.Emote(
+                                input.Id,
+                                input.StartIndex,
+                                input.EndIndex,
+                                input.Name,
+                                input.ImageUrl)),
+                        flags,
+                        e.ChatMessage.IsModerator,
+                        e.ChatMessage.IsSubscriber,
+                        e.ChatMessage.IsBroadcaster,
+                        dto.ToUnixTimeSeconds(),
+                        e.ChatMessage.UserType.ToString(),
+                        e.ChatMessage.Username,
+                        e.ChatMessage.Channel,
+                        e.ChatMessage.Message,
+                        e.ChatMessage.CustomRewardId);
+
+                    ChatMessageWithRewardEventArgs messageWithRewatdEventArgs =
+                        new ChatMessageWithRewardEventArgs(chatMsgWithRewards);
+                    EventManager.OnChatMessageWithRewardEvent(messageWithRewatdEventArgs);
+                    return;
+                }
+
+                StreamLogger.Api.MessageTypes.ChatMessage chatMsg = new StreamLogger.Api.MessageTypes.ChatMessage(
                     e.ChatMessage.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
-                    e.ChatMessage.ColorHex,
+                    colorHex,
                     e.ChatMessage.DisplayName,
                     e.ChatMessage.EmoteSet.Emotes.ConvertAll(input => new StreamLogger.Api.MessageTypes.MiscData.Emote(
                         input.Id,
@@ -65,35 +108,15 @@ namespace TwitchImplementation.EventHandlers
                     e.ChatMessage.UserType.ToString(),
                     e.ChatMessage.Username,
                     e.ChatMessage.Channel,
-                    e.ChatMessage.Message,
-                    e.ChatMessage.CustomRewardId);
-                
-                ChatMessageWithRewardEventArgs messageWithRewatdEventArgs = new ChatMessageWithRewardEventArgs(chatMsgWithRewards);
-                EventManager.OnChatMessageWithRewardEvent(messageWithRewatdEventArgs);
-                return;
+                    e.ChatMessage.Message);
+
+                ChatMessageEventArgs messageEventArgs = new ChatMessageEventArgs(chatMsg);
+                EventManager.OnChatMessageEvent(messageEventArgs);
             }
-                
-            StreamLogger.Api.MessageTypes.ChatMessage chatMsg = new StreamLogger.Api.MessageTypes.ChatMessage(
-                e.ChatMessage.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
-                e.ChatMessage.ColorHex,
-                e.ChatMessage.DisplayName,
-                e.ChatMessage.EmoteSet.Emotes.ConvertAll(input => new StreamLogger.Api.MessageTypes.MiscData.Emote(input.Id,
-                    input.StartIndex,
-                    input.EndIndex,
-                    input.Name,
-                    input.ImageUrl)),
-                flags,
-                e.ChatMessage.IsModerator,
-                e.ChatMessage.IsSubscriber,
-                e.ChatMessage.IsBroadcaster,
-                dto.ToUnixTimeSeconds(),
-                e.ChatMessage.UserType.ToString(),
-                e.ChatMessage.Username,
-                e.ChatMessage.Channel,
-                e.ChatMessage.Message);
-            
-            ChatMessageEventArgs messageEventArgs = new ChatMessageEventArgs(chatMsg);
-            EventManager.OnChatMessageEvent(messageEventArgs);
+            catch (Exception exception)
+            {
+                Log.Error($"[TwitchClient] {exception}");
+            }
         }
 
         public static void OnHostingStarted(object sender, OnHostingStartedArgs e)

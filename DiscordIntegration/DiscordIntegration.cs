@@ -26,7 +26,7 @@ namespace DiscordIntegration
                 EventManager.HostingStoppedEvent += HostingStoppedEvent;
         }
 
-        private void ChatMessageEvent(object sender, ChatMessageEventArgs e)
+        private void ChatMessageEvent(ChatMessageEventArgs e)
         {
             var meta = $"[#{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
 
@@ -56,7 +56,7 @@ namespace DiscordIntegration
             SendDiscordWebhook(msg);
         }
 
-        private void ChatMessageWithRewardEvent(object sender, ChatMessageWithRewardEventArgs e)
+        private void ChatMessageWithRewardEvent(ChatMessageWithRewardEventArgs e)
         {
             var meta = $"[#{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
 
@@ -78,7 +78,7 @@ namespace DiscordIntegration
             SendDiscordWebhook(msg);
         }
 
-        public void HostNotificationEvent(object sender, HostNotificationEventArgs e)
+        public void HostNotificationEvent(HostNotificationEventArgs e)
         {
             var meta = $"[{e.HostNotification.TargetChannel}][{DateTimeOffset.FromUnixTimeSeconds(e.HostNotification.Timestamp).ToLocalTime():HH:mm}]";
 
@@ -98,7 +98,7 @@ namespace DiscordIntegration
             SendDiscordWebhook(msg);
         }
 
-        private void HostingStartedEvent(object sender, HostingStartedEventArgs e)
+        private void HostingStartedEvent(HostingStartedEventArgs e)
         {
             var meta = $"[{e.HostingStarted.HostingChannel}][{DateTimeOffset.FromUnixTimeSeconds(e.HostingStarted.Timestamp).ToLocalTime():HH:mm}]";
 
@@ -110,7 +110,7 @@ namespace DiscordIntegration
             SendDiscordWebhook(msg);
         }
 
-        private void HostingStoppedEvent(object sender, HostingStoppedEventArgs e)
+        private void HostingStoppedEvent(HostingStoppedEventArgs e)
         {
             var meta = $"[{e.HostingStopped.HostingChannel}][{DateTimeOffset.FromUnixTimeSeconds(e.HostingStopped.Timestamp).ToLocalTime():HH:mm}]";
 

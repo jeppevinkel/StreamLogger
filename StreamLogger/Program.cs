@@ -17,10 +17,18 @@ namespace StreamLogger
             LogWriter = Task.Run(Log.WriteLog);
             AppDomain.CurrentDomain.AssemblyResolve += 
                 CurrentDomain_AssemblyResolve;
+
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
             
             IntegrationLoader.Run();
             
             Console.ReadLine();
+        }
+
+        private static void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception exception = (Exception) e.ExceptionObject;
+            Log.Error($"[UNHANDLED] {exception}");
         }
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)

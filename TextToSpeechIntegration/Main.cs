@@ -38,7 +38,7 @@ namespace TextToSpeechIntegration
             }
         }
 
-        private void OnChatMessageEvent(object sender, ChatMessageEventArgs e)
+        private void OnChatMessageEvent(ChatMessageEventArgs e)
         {
             if (Config.ExcludePrefix.Contains(e.Message.MessageContent[0]))
             {
@@ -183,7 +183,7 @@ namespace TextToSpeechIntegration
             _manager.CustomSynthesize(sb.ToString(), voiceSettings.LanguageCode, voiceSettings.Name, voiceSettings.VoiceGender, voiceSettings.SpeakingRate, voiceSettings.Pitch);
         }
         
-        private void OnRewardEvent(object sender, ChatMessageWithRewardEventArgs e)
+        private void OnRewardEvent(ChatMessageWithRewardEventArgs e)
         {
             if (e.Message.RewardId != Config.RewardId)
             {
