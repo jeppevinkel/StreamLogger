@@ -55,10 +55,10 @@ namespace TwitchImplementation.EventHandlers
 
                 string colorHex = e.ChatMessage.ColorHex;
 
-                // if (string.IsNullOrEmpty(colorHex))
-                // {
-                //     colorHex = DefaultColors[StreamLogger.Loader.IntegrationLoader.Random.Next(DefaultColors.Length)];
-                // }
+                if (string.IsNullOrEmpty(colorHex))
+                {
+                    colorHex = DefaultColors[StreamLogger.Loader.IntegrationLoader.Random.Next(DefaultColors.Length)];
+                }
 
                 if (!string.IsNullOrWhiteSpace(e.ChatMessage.CustomRewardId))
                 {

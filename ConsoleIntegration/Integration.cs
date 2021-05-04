@@ -37,16 +37,32 @@ namespace ConsoleIntegration
             }
 
             string msg;
-            
-            if (e.Message.Flags.Contains("IsMe"))
+
+            try
             {
-                msg =
-                    $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)} {e.Message.MessageContent.Pastel(e.Message.Color)}";
+                if (e.Message.Flags.Contains("IsMe"))
+                {
+                    msg =
+                        $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)} {e.Message.MessageContent.Pastel(e.Message.Color)}";
+                }
+                else
+                {
+                    msg =
+                        $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)}: {e.Message.MessageContent}";
+                }
             }
-            else
+            catch
             {
-                msg =
-                    $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)}: {e.Message.MessageContent}";
+                if (e.Message.Flags.Contains("IsMe"))
+                {
+                    msg =
+                        $"{meta} {badges}{e.Message.DisplayName} {e.Message.MessageContent}";
+                }
+                else
+                {
+                    msg =
+                        $"{meta} {badges}{e.Message.DisplayName}: {e.Message.MessageContent}";
+                }
             }
 
             Log.Info(msg);
@@ -68,8 +84,16 @@ namespace ConsoleIntegration
 
             string msg;
 
-            msg =
-                $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)}: {e.Message.MessageContent} ({e.Message.RewardId})";
+            try
+            {
+                msg =
+                    $"{meta} {badges}{e.Message.DisplayName.Pastel(e.Message.Color)}: {e.Message.MessageContent} ({e.Message.RewardId})";
+            }
+            catch
+            {
+                msg =
+                    $"{meta} {badges}{e.Message.DisplayName}: {e.Message.MessageContent} ({e.Message.RewardId})";
+            }
 
             Log.Info(msg);
         }
