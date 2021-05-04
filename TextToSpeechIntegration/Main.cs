@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -64,6 +65,13 @@ namespace TextToSpeechIntegration
                             e.Message.MessageContent = e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr), substr.Length);
                             break;
                         }
+
+                        if (!DoesCultureExist(keyValuePair.Value))
+                        {
+                            e.Message.MessageContent = e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr), substr.Length);
+                            break;
+                        }
+                        
                         voiceSettings.LanguageCode = keyValuePair.Value;
                         e.Message.MessageContent = e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr), substr.Length);
                         break;
@@ -101,6 +109,9 @@ namespace TextToSpeechIntegration
                         }
                         if (float.TryParse(keyValuePair.Value, out float pitch))
                         {
+                            if (pitch > 8f) {pitch = 8f;}
+                            if (pitch < -8f) pitch = -8f;
+                            
                             voiceSettings.Pitch = pitch;
                             e.Message.MessageContent =
                                 e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr),
@@ -118,6 +129,9 @@ namespace TextToSpeechIntegration
                         }
                         if (float.TryParse(keyValuePair.Value, out float rate))
                         {
+                            if (rate > 2) rate = 2;
+                            if (rate < .3f) rate = .3f;
+                            
                             voiceSettings.SpeakingRate = rate;
                             e.Message.MessageContent =
                                 e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr),
@@ -209,6 +223,13 @@ namespace TextToSpeechIntegration
                             e.Message.MessageContent = e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr), substr.Length);
                             break;
                         }
+
+                        if (!DoesCultureExist(keyValuePair.Value))
+                        {
+                            e.Message.MessageContent = e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr), substr.Length);
+                            break;
+                        }
+                        
                         voiceSettings.LanguageCode = keyValuePair.Value;
                         e.Message.MessageContent = e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr), substr.Length);
                         break;
@@ -246,6 +267,9 @@ namespace TextToSpeechIntegration
                         }
                         if (float.TryParse(keyValuePair.Value, out float pitch))
                         {
+                            if (pitch > 8f) {pitch = 8f;}
+                            if (pitch < -8f) pitch = -8f;
+                            
                             voiceSettings.Pitch = pitch;
                             e.Message.MessageContent =
                                 e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr),
@@ -263,6 +287,9 @@ namespace TextToSpeechIntegration
                         }
                         if (float.TryParse(keyValuePair.Value, out float rate))
                         {
+                            if (rate > 2) rate = 2;
+                            if (rate < .3f) rate = .3f;
+                            
                             voiceSettings.SpeakingRate = rate;
                             e.Message.MessageContent =
                                 e.Message.MessageContent.Remove(e.Message.MessageContent.IndexOf(substr),
@@ -350,6 +377,11 @@ namespace TextToSpeechIntegration
             });
             
             return result.Length > 0 ? result : name;
+        }
+        
+        private static bool DoesCultureExist(string cultureName)
+        {
+            return CultureInfo.GetCultures(CultureTypes.AllCultures).Any(culture => string.Equals(culture.Name, cultureName, StringComparison.CurrentCultureIgnoreCase));
         }
     }
 }

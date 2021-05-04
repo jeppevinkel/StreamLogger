@@ -60,6 +60,13 @@ namespace TwitchImplementation.EventHandlers
                     colorHex = DefaultColors[StreamLogger.Loader.IntegrationLoader.Random.Next(DefaultColors.Length)];
                 }
 
+                string avatarUrl = null;
+
+                if (Main.Instance._bot._api is not null)
+                {
+                    avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.ChatMessage.UserId).Result.Logo;
+                }
+
                 if (!string.IsNullOrWhiteSpace(e.ChatMessage.CustomRewardId))
                 {
                     ChatMessageWithReward chatMsgWithRewards = new ChatMessageWithReward(
@@ -81,6 +88,8 @@ namespace TwitchImplementation.EventHandlers
                         e.ChatMessage.UserType.ToString(),
                         e.ChatMessage.Username,
                         e.ChatMessage.Channel,
+                        e.ChatMessage.Bits,
+                        avatarUrl,
                         e.ChatMessage.Message,
                         e.ChatMessage.CustomRewardId);
 
@@ -108,6 +117,8 @@ namespace TwitchImplementation.EventHandlers
                     e.ChatMessage.UserType.ToString(),
                     e.ChatMessage.Username,
                     e.ChatMessage.Channel,
+                    e.ChatMessage.Bits,
+                    avatarUrl,
                     e.ChatMessage.Message);
 
                 ChatMessageEventArgs messageEventArgs = new ChatMessageEventArgs(chatMsg);

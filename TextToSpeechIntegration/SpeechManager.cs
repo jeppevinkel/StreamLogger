@@ -97,9 +97,12 @@ namespace TextToSpeechIntegration
             HttpResponseMessage response = Client.PostAsync($"{ApiUrl}?key={Config.ApiKey}", content).Result;
             string responseString = response.Content.ReadAsStringAsync().Result;
             var responseData = JsonSerializer.Deserialize<SynthesisResponse>(responseString, options);
-            byte[] soundData = string.IsNullOrEmpty(responseData?.AudioContent) ? System.Array.Empty<byte>() : System.Convert.FromBase64String(responseData.AudioContent);
+            if (responseData?.AudioContent is not null)
+            {
+                byte[] soundData = string.IsNullOrEmpty(responseData?.AudioContent) ? System.Array.Empty<byte>() : System.Convert.FromBase64String(responseData.AudioContent);
 
-            EnqueueSpeech(soundData);
+                EnqueueSpeech(soundData);
+            }
         }
 
         public void EnqueueSpeech(byte[] data)

@@ -81,6 +81,8 @@ namespace TwitchImplementation.TwitchBot.Client
                 chatMessage.UserType,
                 chatMessage.Username,
                 chatMessage.Channel,
+                chatMessage.Bits,
+                null,
                 chatMessage.Message);
 
             ChatMessageEventArgs messageEventArgs = new ChatMessageEventArgs(chatMsg);

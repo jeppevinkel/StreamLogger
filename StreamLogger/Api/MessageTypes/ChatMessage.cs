@@ -20,9 +20,11 @@ namespace StreamLogger.Api.MessageTypes
         public string UserType;
         public string Username;
         public string Channel;
+        public int Bits;
+        public string AvatarUrl;
         public string MessageContent;
 
-        public ChatMessage(Dictionary<string, int> badges, string color, string displayName, List<Emote> emotes, HashSet<string> flags, bool mod, bool subscriber, bool broadcaster, long timestamp, string userType, string username, string channel, string messageContent)
+        public ChatMessage(Dictionary<string, int> badges, string color, string displayName, List<Emote> emotes, HashSet<string> flags, bool mod, bool subscriber, bool broadcaster, long timestamp, string userType, string username, string channel, int bits, string avatarUrl, string messageContent)
         {
             Badges = badges ?? new Dictionary<string, int>();
             Color = color;
@@ -33,9 +35,11 @@ namespace StreamLogger.Api.MessageTypes
             Subscriber = subscriber;
             Broadcaster = broadcaster;
             Timestamp = timestamp;
-            UserType = username;
+            UserType = userType;
             Username = username;
             Channel = channel;
+            Bits = bits;
+            AvatarUrl = avatarUrl;
             MessageContent = messageContent;
         }
     }

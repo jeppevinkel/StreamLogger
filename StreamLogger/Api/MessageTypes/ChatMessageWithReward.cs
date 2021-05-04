@@ -20,23 +20,27 @@ namespace StreamLogger.Api.MessageTypes
         public string UserType;
         public string Username;
         public string Channel;
+        public int Bits;
+        public string AvatarUrl;
         public string MessageContent;
         public string RewardId;
 
-        public ChatMessageWithReward(Dictionary<string, int> badges, string color, string displayName, List<Emote> emotes, HashSet<string> flags, bool mod, bool subscriber, bool broadcaster, long timestamp, string userType, string username, string channel, string messageContent, string rewardId)
+        public ChatMessageWithReward(Dictionary<string, int> badges, string color, string displayName, List<Emote> emotes, HashSet<string> flags, bool mod, bool subscriber, bool broadcaster, long timestamp, string userType, string username, string channel, int bits, string avatarUrl, string messageContent, string rewardId)
         {
             Badges = badges ?? new Dictionary<string, int>();
             Color = color;
-            DisplayName = displayName;
+            DisplayName = string.IsNullOrEmpty(displayName) ? username : displayName;
             Emotes = emotes ?? new List<Emote>();
             Flags = flags;
             Mod = mod;
             Subscriber = subscriber;
             Broadcaster = broadcaster;
             Timestamp = timestamp;
-            UserType = username;
+            UserType = userType;
             Username = username;
             Channel = channel;
+            Bits = bits;
+            AvatarUrl = avatarUrl;
             MessageContent = messageContent;
             RewardId = rewardId;
         }

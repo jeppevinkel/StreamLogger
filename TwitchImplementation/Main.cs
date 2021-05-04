@@ -9,6 +9,7 @@ using StreamLogger.Api.MessageTypes;
 using StreamLogger.Api.MessageTypes.MiscData;
 using TwitchImplementation.EventHandlers;
 using TwitchImplementation.TwitchBot.Auth;
+using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -53,11 +54,19 @@ namespace TwitchImplementation
     {
         internal readonly TwitchClient _client;
         internal readonly TwitchPubSub _pubsub;
+        internal readonly TwitchAPI _api;
         internal readonly bool _anonymous = false;
 	
         public Bot(bool anonymous = false)
         {
             _anonymous = anonymous;
+
+            if (!anonymous)
+            {
+                _api = new TwitchAPI();
+                _api.Settings.ClientId = Main.Instance.Config.ClientId;
+                _api.Settings.AccessToken = AuthenticationManager.TokenData.AccessToken;
+            }
             
             ConnectionCredentials credentials = anonymous
                 ? new ConnectionCredentials("justinfan123", "justinfan123")
