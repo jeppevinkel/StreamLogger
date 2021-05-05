@@ -23,33 +23,6 @@ namespace StreamLogger
             
             IntegrationLoader.Run();
 
-            // var sub = new Subscription(new Dictionary<string, int>(),
-            //     "#ffdddd",
-            //     "jopoPPoplo",
-            //     new List<Emote>(),
-            //     null,
-            //     false,
-            //     true,
-            //     DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            //     "user",
-            //     "jopoppoplo",
-            //     "234134",
-            //     "jeppevinkel",
-            //     "http://www.libpng.org/pub/png/img_png/OwlAlpha.png",
-            //     "This is the message I sent to signify my subscription!",
-            //     SubscriptionPlan.Prime,
-            //     "Prime",
-            //     3,
-            //     true,
-            //     2,
-            //     "This is the system message from Twitch.");
-            // Task.Run(async () =>
-            // {
-            //     await Task.Delay(10000);
-            //     EventManager.OnReSubscriptionEvent(new ReSubscriptionEventArgs(sub));
-            // });
-            
-            
             Console.ReadLine();
         }
 
