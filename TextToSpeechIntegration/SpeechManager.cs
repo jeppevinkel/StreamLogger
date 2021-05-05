@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using LibVLCSharp.Shared;
 using StreamLogger;
@@ -84,7 +83,7 @@ namespace TextToSpeechIntegration
             HttpResponseMessage response = Client.PostAsync($"{ApiUrl}?key={Config.ApiKey}", content).Result;
             string responseString = response.Content.ReadAsStringAsync().Result;
             var responseData = JsonSerializer.Deserialize<SynthesisResponse>(responseString, options);
-            byte[] soundData = string.IsNullOrEmpty(responseData?.AudioContent) ? System.Array.Empty<byte>() : System.Convert.FromBase64String(responseData.AudioContent);
+            byte[] soundData = string.IsNullOrEmpty(responseData?.AudioContent) ? Array.Empty<byte>() : Convert.FromBase64String(responseData.AudioContent);
 
             EnqueueSpeech(soundData);
         }
@@ -107,7 +106,7 @@ namespace TextToSpeechIntegration
             var responseData = JsonSerializer.Deserialize<SynthesisResponse>(responseString, options);
             if (responseData?.AudioContent is not null)
             {
-                byte[] soundData = string.IsNullOrEmpty(responseData?.AudioContent) ? System.Array.Empty<byte>() : System.Convert.FromBase64String(responseData.AudioContent);
+                byte[] soundData = string.IsNullOrEmpty(responseData?.AudioContent) ? Array.Empty<byte>() : Convert.FromBase64String(responseData.AudioContent);
 
                 EnqueueSpeech(soundData);
             }
@@ -121,11 +120,11 @@ namespace TextToSpeechIntegration
 
         public void PlayMp3Data(byte[] data)
         {
-                stream.Write(data, 0, data.Length);
-                stream.Position = 0;
-                Media media;
-                media = new Media(libvlc, new StreamMediaInput(stream));
-                mediaPlayer.Play(media);
+            stream.Write(data, 0, data.Length);
+            stream.Position = 0;
+            Media media;
+            media = new Media(libvlc, new StreamMediaInput(stream));
+            mediaPlayer.Play(media);
         }
 
         private void MediaPlayerPlaying(object sender, EventArgs e)

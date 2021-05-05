@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using StreamLogger;
 using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
 using StreamLogger.Api.MessageTypes.MiscData;

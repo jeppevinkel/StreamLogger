@@ -1,27 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using StreamLogger;
 using StreamLogger.Api;
-using StreamLogger.Api.EventArgs;
-using StreamLogger.Api.MessageTypes;
-using StreamLogger.Api.MessageTypes.MiscData;
 using TwitchImplementation.EventHandlers;
 using TwitchImplementation.TwitchBot.Auth;
 using TwitchLib.Api;
-using TwitchLib.Api.Helix.Models.ChannelPoints;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client;
-using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
-using TwitchLib.Communication.Events;
 using TwitchLib.Communication.Models;
 using TwitchLib.PubSub;
-using TwitchLib.PubSub.Events;
-using OnLogArgs = TwitchLib.Client.Events.OnLogArgs;
 
 namespace TwitchImplementation
 {

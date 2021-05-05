@@ -6,9 +6,14 @@ using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
 using StreamLogger.Api.MessageTypes;
 using StreamLogger.Api.MessageTypes.MiscData;
+using StreamLogger.Loader;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Events;
+using ChatMessage = StreamLogger.Api.MessageTypes.ChatMessage;
+using Emote = StreamLogger.Api.MessageTypes.MiscData.Emote;
+using HostingStarted = StreamLogger.Api.MessageTypes.HostingStarted;
+using HostingStopped = StreamLogger.Api.MessageTypes.HostingStopped;
 
 namespace TwitchImplementation.EventHandlers
 {
@@ -57,7 +62,7 @@ namespace TwitchImplementation.EventHandlers
 
                 if (string.IsNullOrEmpty(colorHex))
                 {
-                    colorHex = DefaultColors[StreamLogger.Loader.IntegrationLoader.Random.Next(DefaultColors.Length)];
+                    colorHex = DefaultColors[IntegrationLoader.Random.Next(DefaultColors.Length)];
                 }
 
                 string avatarUrl = null;
@@ -74,7 +79,7 @@ namespace TwitchImplementation.EventHandlers
                         colorHex,
                         e.ChatMessage.DisplayName,
                         e.ChatMessage.EmoteSet.Emotes.ConvertAll(input =>
-                            new StreamLogger.Api.MessageTypes.MiscData.Emote(
+                            new Emote(
                                 input.Id,
                                 input.StartIndex,
                                 input.EndIndex,
@@ -99,11 +104,11 @@ namespace TwitchImplementation.EventHandlers
                     return;
                 }
 
-                StreamLogger.Api.MessageTypes.ChatMessage chatMsg = new StreamLogger.Api.MessageTypes.ChatMessage(
+                ChatMessage chatMsg = new ChatMessage(
                     e.ChatMessage.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
                     colorHex,
                     e.ChatMessage.DisplayName,
-                    e.ChatMessage.EmoteSet.Emotes.ConvertAll(input => new StreamLogger.Api.MessageTypes.MiscData.Emote(
+                    e.ChatMessage.EmoteSet.Emotes.ConvertAll(input => new Emote(
                         input.Id,
                         input.StartIndex,
                         input.EndIndex,
@@ -134,7 +139,7 @@ namespace TwitchImplementation.EventHandlers
         public static void OnHostingStarted(object sender, OnHostingStartedArgs e)
         {
             HostingStartedEventArgs hostingStartedEventArgs = new HostingStartedEventArgs(
-                new StreamLogger.Api.MessageTypes.HostingStarted(
+                new HostingStarted(
                     e.HostingStarted.TargetChannel,
                     e.HostingStarted.HostingChannel,
                     e.HostingStarted.Viewers,
@@ -145,7 +150,7 @@ namespace TwitchImplementation.EventHandlers
         public static void OnHostingStopped(object sender, OnHostingStoppedArgs e)
         {
             HostingStoppedEventArgs hostingStoppedEventArgs = new HostingStoppedEventArgs(
-                new StreamLogger.Api.MessageTypes.HostingStopped(
+                new HostingStopped(
                     e.HostingStopped.HostingChannel,
                     e.HostingStopped.Viewers,
                     DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
@@ -200,7 +205,7 @@ namespace TwitchImplementation.EventHandlers
                 e.Subscriber.ColorHex,
                 e.Subscriber.DisplayName,
                 new EmoteSet(e.Subscriber.EmoteSet, e.Subscriber.ResubMessage).Emotes.ConvertAll(input =>
-                    new StreamLogger.Api.MessageTypes.MiscData.Emote(input.Id,
+                    new Emote(input.Id,
                         input.StartIndex,
                         input.EndIndex,
                         input.Name,
@@ -256,7 +261,7 @@ namespace TwitchImplementation.EventHandlers
                 e.ReSubscriber.ColorHex,
                 e.ReSubscriber.DisplayName,
                 new EmoteSet(e.ReSubscriber.EmoteSet, e.ReSubscriber.ResubMessage).Emotes.ConvertAll(input =>
-                    new StreamLogger.Api.MessageTypes.MiscData.Emote(input.Id,
+                    new Emote(input.Id,
                         input.StartIndex,
                         input.EndIndex,
                         input.Name,

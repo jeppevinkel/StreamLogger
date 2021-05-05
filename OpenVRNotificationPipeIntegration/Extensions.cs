@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Net;
 
 namespace OpenVRNotificationPipeIntegration
 {
@@ -53,7 +54,7 @@ namespace OpenVRNotificationPipeIntegration
 
         public static Image DownloadImage(string fromUrl)
         {
-            using (System.Net.WebClient webClient = new System.Net.WebClient())
+            using (WebClient webClient = new WebClient())
             {
                 using (Stream stream = webClient.OpenRead(fromUrl))
                 {

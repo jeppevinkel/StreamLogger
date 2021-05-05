@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Pastel;
 using StreamLogger;
-using StreamLogger.Api;
-using StreamLogger.Api.EventArgs;
-using StreamLogger.Api.MessageTypes.MiscData;
 using TwitchImplementation.TwitchBot.Client;
-using TwitchImplementation.TwitchBot.Client.Enums;
 using TwitchImplementation.TwitchBot.Client.Models;
-using Emote = StreamLogger.Api.MessageTypes.MiscData.Emote;
 
 namespace TwitchImplementation.TwitchBot
 {

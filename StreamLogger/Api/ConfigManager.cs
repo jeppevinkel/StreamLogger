@@ -1,13 +1,13 @@
 ﻿using System;
-using System.IO;
-using StreamLogger.YamlExtensions;
-using YamlDotNet.Serialization;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using StreamLogger.Api.Extensions;
 using StreamLogger.Api.Interfaces;
 using StreamLogger.Loader;
+using StreamLogger.YamlExtensions;
 using YamlDotNet.Core;
+using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization.NodeDeserializers;
 

@@ -4,7 +4,6 @@ using System.Drawing.Imaging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using OpenVRNotificationPipeIntegration.EventHandlers;
 using StreamLogger;
 using Websocket.Client;
 
@@ -29,7 +28,7 @@ namespace OpenVRNotificationPipeIntegration
             
             Client.DisconnectionHappened.Subscribe(info =>
             {
-            Log.Warn($"[Pipe] Disconnected, type: {info.Type}\n{info.CloseStatusDescription}");
+                Log.Warn($"[Pipe] Disconnected, type: {info.Type}\n{info.CloseStatusDescription}");
             });
             
             Client.ReconnectTimeout = null;

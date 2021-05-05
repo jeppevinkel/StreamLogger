@@ -1,9 +1,8 @@
 ﻿using System;
-using StreamLogger.Api;
 using System.IO;
-using System.Text.Json;
 using OpenVRNotificationPipeIntegration.EventHandlers;
 using StreamLogger;
+using StreamLogger.Api;
 
 namespace OpenVRNotificationPipeIntegration
 {
