@@ -74,7 +74,10 @@ namespace OpenVRNotificationPipeIntegration.EventHandlers
                     avatar.Dispose();
                 }
 
-                g.DrawTextBox(msg.DisplayName, style.NameBox, StringAlignment.Center);
+                string nameDisplay = msg.DisplayName;
+                if (Main.Instance.Config.AppendChannel) nameDisplay += $" [{msg.Channel}]";
+
+                g.DrawTextBox(nameDisplay, style.NameBox, StringAlignment.Center);
                 g.DrawTextBox(msg.MessageContent, style.MessageBox);
                 g.DrawTextBox(msg.Bits.ToString(), style.BitsBox, StringAlignment.Center);
             }
@@ -118,7 +121,10 @@ namespace OpenVRNotificationPipeIntegration.EventHandlers
                     avatar.Dispose();
                 }
 
-                g.DrawTextBox(msg.DisplayName, style.NameBox, StringAlignment.Center);
+                string nameDisplay = msg.DisplayName;
+                if (Main.Instance.Config.AppendChannel) nameDisplay += $" [{msg.Channel}]";
+
+                g.DrawTextBox(nameDisplay, style.NameBox, StringAlignment.Center);
                 g.DrawTextBox(msg.MessageContent, style.MessageBox);
             }
             return b;

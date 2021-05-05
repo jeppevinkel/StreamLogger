@@ -4,6 +4,6 @@ namespace ConsoleIntegration
 {
     public class Config : IConfig
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
     }
 }

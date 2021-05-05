@@ -81,8 +81,11 @@ namespace OpenVRNotificationPipeIntegration.EventHandlers
                     
                     avatar.Dispose();
                 }
+                
+                string nameDisplay = subscription.DisplayName;
+                if (Main.Instance.Config.AppendChannel) nameDisplay += $" [{subscription.Channel}]";
 
-                g.DrawTextBox(subscription.DisplayName, style.NameBox, StringAlignment.Center);
+                g.DrawTextBox(nameDisplay, style.NameBox, StringAlignment.Center);
                 g.DrawTextBox(subscription.SystemMessage, style.MessageBox);
             }
             return b;
@@ -124,8 +127,11 @@ namespace OpenVRNotificationPipeIntegration.EventHandlers
                     
                     avatar.Dispose();
                 }
+                
+                string nameDisplay = subscription.DisplayName;
+                if (Main.Instance.Config.AppendChannel) nameDisplay += $" [{subscription.Channel}]";
 
-                g.DrawTextBox(subscription.DisplayName, style.NameBox, StringAlignment.Center);
+                g.DrawTextBox(nameDisplay, style.NameBox, StringAlignment.Center);
                 g.DrawTextBox(subscription.SystemMessage, style.MessageBox);
             }
             return b;

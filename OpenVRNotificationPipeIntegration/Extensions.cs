@@ -23,7 +23,8 @@ namespace OpenVRNotificationPipeIntegration
             var fontFormat = new StringFormat
             {
                 Alignment = textBox.Centered ? StringAlignment.Center : StringAlignment.Near,
-                LineAlignment = lineAlignment
+                LineAlignment = lineAlignment,
+                Trimming = StringTrimming.EllipsisCharacter
             };
             
             g.DrawString(text, font, new SolidBrush(fontColor), textBox.Position.ToRectangle(), fontFormat);

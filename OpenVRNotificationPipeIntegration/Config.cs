@@ -5,7 +5,7 @@ namespace OpenVRNotificationPipeIntegration
 {
     public class Config : IConfig
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
 
         public string PipeHost { get; set; } = "ws://localhost";
         public int PipePort { get; set; } = 8077;

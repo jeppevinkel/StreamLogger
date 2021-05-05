@@ -5,10 +5,10 @@ namespace DiscordIntegration
 {
     public class Config : IConfig
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
         
         [Description("Webhook used for Discord messages.")]
-        public string Webhook { get; set; } = "https://discord.com/api/webhooks/774817906130944020/WiN2UesxYFb4T1htrbR_fE6-8323Rre1WR8Wn1fSJLTL526TZXAyksb0z0JH07fqItoI";
+        public string Webhook { get; set; } = "https://discord.com/api/webhooks/xxxxxxxxxxx/xxxxxxxxxxxxx";
         
         [Description("The interval at which messages are pushed to Discord.")]
         public int LogInterval { get; set; } = 1000;

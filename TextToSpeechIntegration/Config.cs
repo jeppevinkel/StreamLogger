@@ -5,7 +5,7 @@ namespace TextToSpeechIntegration
 {
     public class Config : IConfig
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
 
         [Description("The API key from the google cloud console. Located at https://console.cloud.google.com/apis/credentials after you create a project and enable the API.")]
         public string ApiKey { get; set; } = "";
