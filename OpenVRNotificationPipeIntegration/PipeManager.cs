@@ -19,17 +19,23 @@ namespace OpenVRNotificationPipeIntegration
             Client = new WebsocketClient(new Uri($"{main.Config.PipeHost}:{main.Config.PipePort}"));
             Client.ReconnectionHappened.Subscribe(info =>
             {
+                if (info.Type == ReconnectionType.Initial)
+                {
+                    Log.Info("[Pipe] Connected.");
+                    return;
+                }
                 Log.Warn($"[Pipe] Reconnection happened, type: {info.Type}");
             });
             
             Client.DisconnectionHappened.Subscribe(info =>
             {
-                Log.Warn($"[Pipe] Disconnected, type: {info.Type}\n{info.CloseStatusDescription}");
+            Log.Warn($"[Pipe] Disconnected, type: {info.Type}\n{info.CloseStatusDescription}");
             });
-
+            
             Client.ReconnectTimeout = null;
             
             Client.MessageReceived.Subscribe(msg => Log.Info($"[Pipe] Message received: {msg}"));
+            
             Client.Start();
         }
 

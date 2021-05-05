@@ -74,7 +74,7 @@ namespace TwitchImplementation.EventHandlers
             }
             else
             {
-                Log.Info($"[PubSub] Now listening to {e.Topic}");
+                Log.Debug($"[PubSub] Now listening to {e.Topic}");
             }
         }
 

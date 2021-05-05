@@ -36,7 +36,7 @@ namespace OpenVRNotificationPipeIntegration
 
         private void SaveStyle<T>(T style) where T : IBaseNotificationStyle
         {
-            Log.Info("Saving " + style.BasePath);
+            Log.Debug("Saving " + style.BasePath);
             if (!Directory.Exists(style.BasePath)) Directory.CreateDirectory(style.BasePath);
             string stylePath = Path.Combine(style.BasePath, "style.json");
             File.WriteAllText(stylePath, JsonSerializer.Serialize(style, _options));

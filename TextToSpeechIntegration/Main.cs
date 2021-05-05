@@ -192,8 +192,6 @@ namespace TextToSpeechIntegration
                 sb.Append(e.Message.MessageContent);
             }
 
-            Log.Info(e.Message);
-
             _manager.CustomSynthesize(sb.ToString(), voiceSettings.LanguageCode, voiceSettings.Name, voiceSettings.VoiceGender, voiceSettings.SpeakingRate, voiceSettings.Pitch);
         }
         
@@ -349,8 +347,6 @@ namespace TextToSpeechIntegration
             {
                 sb.Append(e.Message.MessageContent);
             }
-
-            Log.Info(e.Message);
 
             _manager.CustomSynthesize(sb.ToString(), voiceSettings.LanguageCode, voiceSettings.Name, voiceSettings.VoiceGender, voiceSettings.SpeakingRate, voiceSettings.Pitch);
         }

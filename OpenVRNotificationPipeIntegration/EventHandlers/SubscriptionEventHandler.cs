@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
 using StreamLogger.Api.EventArgs;
 using StreamLogger.Api.MessageTypes;
 

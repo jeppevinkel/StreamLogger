@@ -21,13 +21,9 @@ namespace OpenVRNotificationPipeIntegration
     {
         public bool MessageEvent { get; set; } = false;
         public bool MessageWithBitsEvent { get; set; } = false;
-        [Description("NOT YET IMPLEMENTED.")]
         public bool FollowEvent { get; set; } = false;
-        [Description("NOT YET IMPLEMENTED.")]
         public bool NewSubscriptionEvent { get; set; } = false;
-        [Description("NOT YET IMPLEMENTED.")]
         public bool ReSubscriptionEvent { get; set; } = false;
-        [Description("NOT YET IMPLEMENTED.")]
-        public bool HostEvent { get; set; } = false;
+        // public bool HostEvent { get; set; } = false;
     }
 }

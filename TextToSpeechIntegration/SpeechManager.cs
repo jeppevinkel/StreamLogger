@@ -41,6 +41,14 @@ namespace TextToSpeechIntegration
         {
             Core.Initialize(@"D:\jeppe\Documents\Rider Projects\StreamLogger\TextToSpeechIntegration\bin\Debug\net5.0\libvlc\win-x64");
             libvlc = new LibVLC(false);
+            libvlc.Log += (sender, args) =>
+            {
+                if (args.Module == "imem") return;
+                if (args.Level == LogLevel.Error)
+                {
+                    Log.Error($"[LibVLC] {args.FormattedLog}");
+                }
+            };
             stream = new MemoryStream();
             mediaPlayer = new MediaPlayer(libvlc);
             mediaPlayer.Stopped += MediaPlayerStopped;
@@ -123,13 +131,13 @@ namespace TextToSpeechIntegration
         private void MediaPlayerPlaying(object sender, EventArgs e)
         {
             _mediaPlayerIdle = false;
-            Log.Info("MediaPLayerPlaying!");
+            Log.Debug("MediaPLayerPlaying!");
         }
 
         private void MediaPlayerStopped(object sender, EventArgs e)
         {
             _mediaPlayerIdle = true;
-            Log.Info("MediaPLayerStopped!");
+            Log.Debug("MediaPLayerStopped!");
         }
         
         public class SynthesisResponse

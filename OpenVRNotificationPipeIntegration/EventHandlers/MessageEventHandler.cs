@@ -1,10 +1,6 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
-using StreamLogger;
-using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
 using StreamLogger.Api.MessageTypes;
 
@@ -37,9 +33,6 @@ namespace OpenVRNotificationPipeIntegration.EventHandlers
             if (notification is null || style is null) return;
 
             Main.Instance.PipeManager.SendImage(notification, style);
-            string filePath = Path.Combine(Paths.Integrations, "test.png");
-            notification.Save(filePath, ImageFormat.Png);
-            Log.Info("Saving test image at " + filePath);
             notification.Dispose();
         }
 

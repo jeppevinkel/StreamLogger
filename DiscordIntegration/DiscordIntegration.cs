@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Net;
-using StreamLogger;
 using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
-using StreamLogger.Api.MessageTypes.MiscData;
 
 namespace DiscordIntegration
 {
