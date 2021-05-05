@@ -80,6 +80,7 @@ namespace TwitchImplementation.TwitchBot.Client
                 dto.ToUnixTimeSeconds(),
                 chatMessage.UserType,
                 chatMessage.Username,
+                chatMessage.UserId,
                 chatMessage.Channel,
                 chatMessage.Bits,
                 null,

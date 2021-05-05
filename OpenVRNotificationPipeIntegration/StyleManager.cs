@@ -30,6 +30,8 @@ namespace OpenVRNotificationPipeIntegration
             NotificationStyles.MessageNotification = LoadStyle(NotificationStyles.MessageNotification);
             NotificationStyles.MessageWithBitsNotification = LoadStyle(NotificationStyles.MessageWithBitsNotification);
             NotificationStyles.FollowNotification = LoadStyle(NotificationStyles.FollowNotification);
+            NotificationStyles.ReSubscription = LoadStyle(NotificationStyles.ReSubscription);
+            NotificationStyles.NewSubscription = LoadStyle(NotificationStyles.NewSubscription);
         }
 
         private void SaveStyle<T>(T style) where T : IBaseNotificationStyle
@@ -88,7 +90,7 @@ namespace OpenVRNotificationPipeIntegration
 
     public class NotificationStyles
     {
-        public const int Length = 3;
+        public const int Length = 5;
 
         public IBaseNotificationStyle this[int index]
         {
@@ -99,6 +101,8 @@ namespace OpenVRNotificationPipeIntegration
                     0 => MessageNotification,
                     1 => MessageWithBitsNotification,
                     2 => FollowNotification,
+                    3 => ReSubscription,
+                    4 => NewSubscription,
                     _ => throw new IndexOutOfRangeException("You are out of bounds for the notification index!")
                 };
             }
@@ -115,6 +119,12 @@ namespace OpenVRNotificationPipeIntegration
                     case 2:
                         FollowNotification = (FollowNotificationStyle)value;
                         break;
+                    case 3:
+                        ReSubscription = (ReSubscriptionNotificationStyle)value;
+                        break;
+                    case 4:
+                        NewSubscription = (NewSubscriptionNotificationStyle)value;
+                        break;
                     default:
                         throw new IndexOutOfRangeException("You are out of bounds for the notification index!");
                 }
@@ -129,6 +139,8 @@ namespace OpenVRNotificationPipeIntegration
                     "Message" => MessageNotification,
                     "MessageWithBits" => MessageWithBitsNotification,
                     "Follow" => FollowNotification,
+                    "ReSubscription" => ReSubscription,
+                    "NewSubscription" => NewSubscription,
                     _ => throw new KeyNotFoundException("The requested notification couldn't be found!")
                 };
             }
@@ -145,6 +157,12 @@ namespace OpenVRNotificationPipeIntegration
                     case "Follow":
                         FollowNotification = (FollowNotificationStyle)value;
                         break;
+                    case "ReSubscription":
+                        ReSubscription = (ReSubscriptionNotificationStyle)value;
+                        break;
+                    case "NewSubscription":
+                        NewSubscription = (NewSubscriptionNotificationStyle)value;
+                        break;
                     default:
                         throw new KeyNotFoundException("The requested notification couldn't be found!");
                 }
@@ -154,6 +172,8 @@ namespace OpenVRNotificationPipeIntegration
         public MessageNotificationStyle MessageNotification { get; set; } = new();
         public MessageWithBitsNotificationStyle MessageWithBitsNotification { get; set; } = new();
         public FollowNotificationStyle FollowNotification { get; set; } = new();
+        public ReSubscriptionNotificationStyle ReSubscription { get; set; } = new();
+        public NewSubscriptionNotificationStyle NewSubscription { get; set; } = new();
     }
 
     public interface IBaseNotificationStyle
@@ -202,13 +222,48 @@ namespace OpenVRNotificationPipeIntegration
     {
         [JsonIgnore] public string BasePath { get; set; }
         public string ImagePath { get; set; }
-        public TextBox NameBox { get; set; } = new TextBox();
+        public string FollowMessage { get; set; } = "{displayName} is now following!";
+        public TextBox MessageBox { get; set; } = new TextBox();
         public PipeStyle PipeStyle { get; set; } = new PipeStyle();
 
         public FollowNotificationStyle()
         {
             BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
                 "Follow");
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+    }
+
+    public class ReSubscriptionNotificationStyle : IBaseNotificationStyle
+    {
+        [JsonIgnore] public string BasePath { get; set; }
+        public string ImagePath { get; set; }
+        public TextBox NameBox { get; set; } = new TextBox();
+        public TextBox MessageBox { get; set; } = new TextBox();
+        public AvatarBox AvatarBox { get; set; } = new AvatarBox();
+        public PipeStyle PipeStyle { get; set; } = new PipeStyle();
+
+        public ReSubscriptionNotificationStyle()
+        {
+            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                "ReSubscription");
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+    }
+
+    public class NewSubscriptionNotificationStyle : IBaseNotificationStyle
+    {
+        [JsonIgnore] public string BasePath { get; set; }
+        public string ImagePath { get; set; }
+        public TextBox NameBox { get; set; } = new TextBox();
+        public TextBox MessageBox { get; set; } = new TextBox();
+        public AvatarBox AvatarBox { get; set; } = new AvatarBox();
+        public PipeStyle PipeStyle { get; set; } = new PipeStyle();
+
+        public NewSubscriptionNotificationStyle()
+        {
+            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                "NewSubscription");
             ImagePath = Path.Combine(BasePath, "bg.png");
         }
     }
@@ -258,14 +313,14 @@ namespace OpenVRNotificationPipeIntegration
         }
     }
 
-    public struct FontColor
+    public class FontColor
     {
         public int R { get; set; }
         public int G { get; set; }
         public int B { get; set; }
         public int A { get; set; }
 
-        public FontColor(int r = 0)
+        public FontColor()
         {
             R = 0;
             G = 0;
@@ -273,7 +328,7 @@ namespace OpenVRNotificationPipeIntegration
             A = 255;
         }
 
-        public FontColor(int r, int g, int b, int a)
+        public FontColor(int r, int g, int b, int a = 255)
         {
             R = r;
             G = g;

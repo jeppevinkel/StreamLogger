@@ -38,22 +38,54 @@ namespace OpenVRNotificationPipeIntegration
             }
             StyleManager = new StyleManager(BaseDir);
 
-            if (File.Exists(StyleManager.NotificationStyles.MessageNotification.ImagePath) || File.Exists(StyleManager.NotificationStyles.MessageWithBitsNotification.ImagePath))
+            if (Config.EnabledEvents.MessageEvent || Config.EnabledEvents.MessageWithBitsEvent)
             {
-                EventManager.ChatMessageEvent += MessageEventHandler.OnMessageEvent;
-            }
-            else
-            {
-                Log.Warn("[Pipe] The specified background image for `Message` and `MessageWithBits` notifications doesn't exist.");
+                if (File.Exists(StyleManager.NotificationStyles.MessageNotification.ImagePath) ||
+                    File.Exists(StyleManager.NotificationStyles.MessageWithBitsNotification.ImagePath))
+                {
+                    EventManager.ChatMessageEvent += MessageEventHandler.OnMessageEvent;
+                }
+                else
+                {
+                    Log.Warn(
+                        "[Pipe] The specified background image for `Message` and `MessageWithBits` notifications doesn't exist.");
+                }
             }
 
-            if (File.Exists(StyleManager.NotificationStyles.FollowNotification.ImagePath))
+            if (Config.EnabledEvents.FollowEvent)
             {
-                //TODO Implement follow notification.
+                if (File.Exists(StyleManager.NotificationStyles.FollowNotification.ImagePath))
+                {
+                    EventManager.FollowEvent += FollowEventHandler.OnFollowEvent;
+                }
+                else
+                {
+                    Log.Warn("[Pipe] The specified background image for `Follow` notification doesn't exist.");
+                }
             }
-            else
+
+            if (Config.EnabledEvents.ReSubscriptionEvent)
             {
-                Log.Warn("[Pipe] The specified background image for `Follow` notification doesn't exist.");
+                if (File.Exists(StyleManager.NotificationStyles.ReSubscription.ImagePath))
+                {
+                    EventManager.ReSubscriptionEvent += SubscriptionEventHandler.OnReSubscriptionEvent;
+                }
+                else
+                {
+                    Log.Warn("[Pipe] The specified background image for `ReSubscription` notification doesn't exist.");
+                }
+            }
+
+            if (Config.EnabledEvents.NewSubscriptionEvent)
+            {
+                if (File.Exists(StyleManager.NotificationStyles.NewSubscription.ImagePath))
+                {
+                    EventManager.NewSubscriptionEvent += SubscriptionEventHandler.OnNewSubscriptionEvent;
+                }
+                else
+                {
+                    Log.Warn("[Pipe] The specified background image for `NewSubscription` notification doesn't exist.");
+                }
             }
         }
 

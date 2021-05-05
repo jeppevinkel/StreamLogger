@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using StreamLogger;
 using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
@@ -10,6 +11,8 @@ using StreamLogger.Api.MessageTypes.MiscData;
 using TwitchImplementation.EventHandlers;
 using TwitchImplementation.TwitchBot.Auth;
 using TwitchLib.Api;
+using TwitchLib.Api.Helix.Models.ChannelPoints;
+using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -56,6 +59,9 @@ namespace TwitchImplementation
         internal readonly TwitchPubSub _pubsub;
         internal readonly TwitchAPI _api;
         internal readonly bool _anonymous = false;
+        internal readonly Dictionary<string, string> ChannelDictionary = new Dictionary<string, string>();
+
+        internal readonly PubSubEventHandler _pubSubEventHandler;
 	
         public Bot(bool anonymous = false)
         {
@@ -78,19 +84,34 @@ namespace TwitchImplementation
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)
             };
             var customClient = new WebSocketClient(clientOptions);
+
+            _pubSubEventHandler = new PubSubEventHandler(this);
+            
             _client = new TwitchClient(customClient);
             _client.Initialize(credentials, Main.Instance.Config.Channels);
 
             _pubsub = new TwitchPubSub();
             
-            _pubsub.OnLog += PubSubEventHandler.OnLog;
-            _pubsub.OnRewardRedeemed += PubSubEventHandler.OnRewardRedeemed;
-            _pubsub.OnPubSubServiceConnected += PubSubEventHandler.OnPubSubServiceConnected;
-            _pubsub.OnPubSubServiceError += PubSubEventHandler.OnPubSubServiceError;
-            _pubsub.OnListenResponse += PubSubEventHandler.OnListenResponse;
-            
-            _pubsub.ListenToRewards("47214265"); //TODO Make automatic channel id resolution.
-            
+            _pubsub.OnLog += _pubSubEventHandler.OnLog;
+            _pubsub.OnRewardRedeemed += _pubSubEventHandler.OnRewardRedeemed;
+            _pubsub.OnPubSubServiceConnected += _pubSubEventHandler.OnPubSubServiceConnected;
+            _pubsub.OnPubSubServiceError += _pubSubEventHandler.OnPubSubServiceError;
+            _pubsub.OnListenResponse += _pubSubEventHandler.OnListenResponse;
+            _pubsub.OnFollow += _pubSubEventHandler.OnFollow;
+
+            Task.Run(async () =>
+            {
+                GetUsersResponse users = await _api.Helix.Users.GetUsersAsync(null, Main.Instance.Config.Channels);
+
+                foreach (User user in users.Users)
+                {
+                    ChannelDictionary.Add(user.Id, user.Login);
+                    
+                    _pubsub.ListenToRewards(user.Id); //TODO Make automatic channel id resolution.
+                    _pubsub.ListenToFollows(user.Id);
+                }
+            });
+
             _pubsub.Connect();
 
             _client.OnLog += ClientEventHandler.OnLog;

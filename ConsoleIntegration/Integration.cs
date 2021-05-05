@@ -20,6 +20,7 @@ namespace ConsoleIntegration
             EventManager.HostingStoppedEvent += HostingStoppedEvent;
             EventManager.NewSubscriptionEvent += NewSubscriptionEvent;
             EventManager.ReSubscriptionEvent += ReSubscriptionEvent;
+            EventManager.FollowEvent += FollowEvent;
         }
 
         private void ChatMessageEvent(ChatMessageEventArgs e)
@@ -180,6 +181,18 @@ namespace ConsoleIntegration
 
             msg =
                 $"{meta} {e.Subscription.SystemMessage} with the following message: {e.Subscription.MessageContent}";
+
+            Log.Info(msg);
+        }
+
+        private void FollowEvent(FollowEventArgs e)
+        {
+            var meta = $"[{e.Follow.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Follow.Timestamp).ToLocalTime():HH:mm}]";
+
+            string msg;
+
+            msg =
+                $"{meta} {e.Follow.DisplayName} is now following {e.Follow.Channel}!";
 
             Log.Info(msg);
         }

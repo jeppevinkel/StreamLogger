@@ -1,41 +1,72 @@
 ﻿using System;
 using StreamLogger;
+using StreamLogger.Api;
+using StreamLogger.Api.EventArgs;
+using StreamLogger.Api.MessageTypes;
 using TwitchImplementation.TwitchBot.Auth;
 using TwitchLib.PubSub.Events;
 
 namespace TwitchImplementation.EventHandlers
 {
-    public static class PubSubEventHandler
+    public class PubSubEventHandler
     {
-        public static void OnLog(object sender, OnLogArgs e)
+        private Bot _bot;
+
+        internal PubSubEventHandler(Bot bot)
+        {
+            _bot = bot;
+        }
+        
+        public void OnLog(object sender, OnLogArgs e)
         {
             Log.Debug($"[PubSub] {e.Data}");
         }
           
-        public static void OnPubSubServiceError(object sender, OnPubSubServiceErrorArgs e)
+        public void OnPubSubServiceError(object sender, OnPubSubServiceErrorArgs e)
         {
             Log.Error($"[PubSub] {e.Exception}");
         }
           
-        public static void OnRewardRedeemed(object sender, OnRewardRedeemedArgs e)
+        public void OnRewardRedeemed(object sender, OnRewardRedeemedArgs e)
         {
-            Log.Debug($"[PubSub] {e.DisplayName} just redeemed {e.RewardTitle} with message: {e.Message}");
+            var reward = new Reward
+            {
+                Channel = _bot.ChannelDictionary[e.ChannelId],
+                ChannelId = e.ChannelId,
+                DisplayName = e.DisplayName,
+                RewardCost = e.RewardCost,
+                RewardId = e.RewardId,
+                RewardPrompt = e.RewardPrompt,
+                RewardTitle = e.RewardTitle,
+                Timestamp = new DateTimeOffset(e.TimeStamp).ToUnixTimeSeconds(),
+                Username = e.Login
+            };
+            
+            EventManager.OnRewardEvent(new RewardEventArgs(reward));
         }
         
-        public static void OnPubSubServiceConnected(object sender, EventArgs e)
+        public void OnPubSubServiceConnected(object sender, EventArgs e)
         {
             Log.Info("[PubSub] Service connected."); //TODO Get this to work properly.
-            // if (Main.Instance._bot._anonymous)
-            // {
-            //     Main.Instance._bot._pubsub.SendTopics();
-            // }
-            // else
-            // {
-            //     Main.Instance._bot._pubsub.SendTopics(AuthenticationManager.TokenData.AccessToken);
-            // }
+            try
+            {
+                if (_bot._anonymous)
+                {
+                    _bot._pubsub.SendTopics();
+                }
+                else
+                {
+                    _bot._pubsub.SendTopics(AuthenticationManager.TokenData.AccessToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception);
+            }
+            
         }
                 
-        public static void OnListenResponse(object sender, OnListenResponseArgs e)
+        public void OnListenResponse(object sender, OnListenResponseArgs e)
         {
             if (!e.Successful)
             {
@@ -45,6 +76,11 @@ namespace TwitchImplementation.EventHandlers
             {
                 Log.Info($"[PubSub] Now listening to {e.Topic}");
             }
+        }
+
+        public void OnFollow(object sender, OnFollowArgs e)
+        {
+            EventManager.OnFollowEvent(new FollowEventArgs(new Follow(_bot.ChannelDictionary[e.FollowedChannelId], e.FollowedChannelId, e.DisplayName, DateTimeOffset.UtcNow.ToUnixTimeSeconds(), e.Username, e.UserId)));
         }
     }
 }

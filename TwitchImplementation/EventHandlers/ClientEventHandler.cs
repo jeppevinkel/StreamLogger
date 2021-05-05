@@ -116,6 +116,7 @@ namespace TwitchImplementation.EventHandlers
                     dto.ToUnixTimeSeconds(),
                     e.ChatMessage.UserType.ToString(),
                     e.ChatMessage.Username,
+                    e.ChatMessage.UserId,
                     e.ChatMessage.Channel,
                     e.ChatMessage.Bits,
                     avatarUrl,
@@ -186,6 +187,13 @@ namespace TwitchImplementation.EventHandlers
                 TwitchLib.Client.Enums.SubscriptionPlan.Tier3 => SubscriptionPlan.Tier3,
                 _ => subPlan
             };
+            
+            string avatarUrl = null;
+
+            if (Main.Instance._bot._api is not null)
+            {
+                avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.Subscriber.UserId).Result.Logo;
+            }
 
             Subscription subscription = new Subscription(
                 e.Subscriber.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
@@ -203,7 +211,9 @@ namespace TwitchImplementation.EventHandlers
                 dto.ToUnixTimeSeconds(),
                 e.Subscriber.UserType.ToString(),
                 e.Subscriber.Login,
+                e.Subscriber.UserId,
                 e.Channel,
+                avatarUrl,
                 e.Subscriber.ResubMessage,
                 subPlan,
                 e.Subscriber.SubscriptionPlanName,
@@ -233,6 +243,13 @@ namespace TwitchImplementation.EventHandlers
                 TwitchLib.Client.Enums.SubscriptionPlan.Tier3 => SubscriptionPlan.Tier3,
                 _ => subPlan
             };
+            
+            string avatarUrl = null;
+
+            if (Main.Instance._bot._api is not null)
+            {
+                avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.ReSubscriber.UserId).Result.Logo;
+            }
 
             Subscription subscription = new Subscription(
                 e.ReSubscriber.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
@@ -250,7 +267,9 @@ namespace TwitchImplementation.EventHandlers
                 dto.ToUnixTimeSeconds(),
                 e.ReSubscriber.UserType.ToString(),
                 e.ReSubscriber.Login,
+                e.ReSubscriber.UserId,
                 e.Channel,
+                avatarUrl,
                 e.ReSubscriber.ResubMessage,
                 subPlan,
                 e.ReSubscriber.SubscriptionPlanName,

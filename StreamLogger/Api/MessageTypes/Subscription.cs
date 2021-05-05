@@ -18,7 +18,9 @@ namespace StreamLogger.Api.MessageTypes
         public long Timestamp;
         public string UserType;
         public string Username;
+        public string UserId;
         public string Channel;
+        public string AvatarUrl;
         public string MessageContent;
         public SubscriptionPlan SubscriptionPlan;
         public string SubscriptionPlanName;
@@ -27,7 +29,7 @@ namespace StreamLogger.Api.MessageTypes
         public int StreakMonths;
         public string SystemMessage;
         
-        public Subscription(Dictionary<string, int> badges, string color, string displayName, List<Emote> emotes, HashSet<string> flags, bool mod, bool subscriber, long timestamp, string userType, string username, string channel, string messageContent, SubscriptionPlan subscriptionPlan, string subscriptionPlanName, int cumulativeMonths, bool shouldShareStreak, int streakMonths, string systemMessage)
+        public Subscription(Dictionary<string, int> badges, string color, string displayName, List<Emote> emotes, HashSet<string> flags, bool mod, bool subscriber, long timestamp, string userType, string username, string userId, string channel, string avatarUrl, string messageContent, SubscriptionPlan subscriptionPlan, string subscriptionPlanName, int cumulativeMonths, bool shouldShareStreak, int streakMonths, string systemMessage)
         {
             Badges = badges ?? new Dictionary<string, int>();
             Color = color;
@@ -39,7 +41,9 @@ namespace StreamLogger.Api.MessageTypes
             Timestamp = timestamp;
             UserType = username;
             Username = username;
+            UserId = userId;
             Channel = channel;
+            AvatarUrl = avatarUrl;
             MessageContent = messageContent;
             SubscriptionPlan = subscriptionPlan;
             SubscriptionPlanName = subscriptionPlanName;

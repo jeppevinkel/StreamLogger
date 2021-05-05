@@ -1,4 +1,5 @@
-﻿using StreamLogger.Api.Interfaces;
+﻿using System.ComponentModel;
+using StreamLogger.Api.Interfaces;
 
 namespace OpenVRNotificationPipeIntegration
 {
@@ -8,9 +9,11 @@ namespace OpenVRNotificationPipeIntegration
 
         public string PipeHost { get; set; } = "ws://localhost";
         public int PipePort { get; set; } = 8077;
-
         public EventToggles EnabledEvents { get; set; } = new EventToggles();
-        
+
+        [Description("Enable to append the channel to the display name.")]
+        public bool AppendChannel { get; set; } = false;
+
         public bool ShowDebugOutline { get; set; } = false;
     }
 
@@ -18,5 +21,13 @@ namespace OpenVRNotificationPipeIntegration
     {
         public bool MessageEvent { get; set; } = false;
         public bool MessageWithBitsEvent { get; set; } = false;
+        [Description("NOT YET IMPLEMENTED.")]
+        public bool FollowEvent { get; set; } = false;
+        [Description("NOT YET IMPLEMENTED.")]
+        public bool NewSubscriptionEvent { get; set; } = false;
+        [Description("NOT YET IMPLEMENTED.")]
+        public bool ReSubscriptionEvent { get; set; } = false;
+        [Description("NOT YET IMPLEMENTED.")]
+        public bool HostEvent { get; set; } = false;
     }
 }

@@ -16,6 +16,8 @@ namespace StreamLogger.Api
         public static event CustomEventHandler<HostingStoppedEventArgs> HostingStoppedEvent;
         public static event CustomEventHandler<NewSubscriptionEventArgs> NewSubscriptionEvent;
         public static event CustomEventHandler<ReSubscriptionEventArgs> ReSubscriptionEvent;
+        public static event CustomEventHandler<FollowEventArgs> FollowEvent;
+        public static event CustomEventHandler<RewardEventArgs> RewardEvent;
 
         public static void OnChatMessageEvent(ChatMessageEventArgs e)
         {
@@ -50,6 +52,16 @@ namespace StreamLogger.Api
         public static void OnReSubscriptionEvent(ReSubscriptionEventArgs e)
         {
             ReSubscriptionEvent.InvokeSafely(e);
+        }
+
+        public static void OnFollowEvent(FollowEventArgs e)
+        {
+            FollowEvent.InvokeSafely(e);
+        }
+
+        public static void OnRewardEvent(RewardEventArgs e)
+        {
+            RewardEvent.InvokeSafely(e);
         }
 
         public static void InvokeSafely<T>(this CustomEventHandler<T> eventHandler, T args) where T : System.EventArgs
