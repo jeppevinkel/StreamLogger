@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using StreamLogger;
+using StreamLogger.Api;
 
 namespace OpenVRNotificationPipeIntegration
 {
     public class StyleManager
     {
-        public string StylePath;
-        public NotificationStyles NotificationStyles;
+        public string BaseFolder;
+        public NotificationStyles NotificationStyles = new NotificationStyles();
 
         private readonly JsonSerializerOptions _options = new JsonSerializerOptions
         {
@@ -19,65 +21,196 @@ namespace OpenVRNotificationPipeIntegration
         
         public StyleManager(string baseFolder)
         {
-            StylePath = Path.Combine(baseFolder, "Styles.json");
-            if (CheckFileExistence())
-            {
-                LoadStyles();
-            }
-        }
-
-        private void SaveStyles()
-        {
-            File.WriteAllText(StylePath, JsonSerializer.Serialize(NotificationStyles, _options));
+            BaseFolder = Path.Combine(baseFolder, "Notifications");
+            LoadStyles();
         }
 
         public void LoadStyles()
         {
-            try
-            {
-                NotificationStyles = JsonSerializer.Deserialize<NotificationStyles>(File.ReadAllText(StylePath));
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Something went wrong while reading notification styles. Please validate file structure.\n{e}");
-                NotificationStyles = new NotificationStyles();
-                return;
-            }
-            SaveStyles();
+            NotificationStyles.MessageNotification = LoadStyle(NotificationStyles.MessageNotification);
+            NotificationStyles.MessageWithBitsNotification = LoadStyle(NotificationStyles.MessageWithBitsNotification);
+            NotificationStyles.FollowNotification = LoadStyle(NotificationStyles.FollowNotification);
         }
 
-        private bool CheckFileExistence()
+        private void SaveStyle<T>(T style) where T : IBaseNotificationStyle
         {
-            if (File.Exists(StylePath)) return true;
-            NotificationStyles = new NotificationStyles();
-            File.WriteAllText(StylePath, JsonSerializer.Serialize(NotificationStyles, _options));
+            Log.Info("Saving " + style.BasePath);
+            if (!Directory.Exists(style.BasePath)) Directory.CreateDirectory(style.BasePath);
+            string stylePath = Path.Combine(style.BasePath, "style.json");
+            File.WriteAllText(stylePath, JsonSerializer.Serialize(style, _options));
+        }
+
+        private static T LoadStyle<T>(string path) where T : IBaseNotificationStyle
+        {
+            return JsonSerializer.Deserialize<T>(File.ReadAllText(path));
+        }
+
+        private T LoadStyle<T>(T style) where T : IBaseNotificationStyle, new()
+        {
+            if (CheckFileExistence(style.BasePath, new T()))
+            {
+                bool errorsOccurred = false;
+                string stylePath = Path.Combine(style.BasePath, "style.json");
+                try
+                {
+                    style = LoadStyle<T>(stylePath);
+                }
+                catch (Exception e)
+                {
+                    errorsOccurred = true;
+                    Log.Error($"Something went wrong while reading notification style for {style.GetType()}. Please validate file structure.\n{e}");
+                }
+
+                if (!errorsOccurred)
+                {
+                    SaveStyle(style);
+                }
+            }
+
+            return style;
+        }
+
+        private bool CheckFileExistence(string dir, object fallback)
+        {
+            string stylePath = Path.Combine(dir, "style.json");
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+                File.WriteAllText(stylePath, JsonSerializer.Serialize(fallback, _options));
+                return false;
+            }
+
+            if (File.Exists(stylePath)) return true;
+            File.WriteAllText(stylePath, JsonSerializer.Serialize(fallback, _options));
             return false;
         }
     }
 
     public class NotificationStyles
     {
-        public MessageNotificationStyle MessageNotificationStyle { get; set; } = new MessageNotificationStyle();
-        public MessageWithBitsNotificationStyle MessageWithBitsNotificationStyle { get; set; } = new MessageWithBitsNotificationStyle();
+        public const int Length = 3;
+
+        public IBaseNotificationStyle this[int index]
+        {
+            get
+            {
+                return index switch
+                {
+                    0 => MessageNotification,
+                    1 => MessageWithBitsNotification,
+                    2 => FollowNotification,
+                    _ => throw new IndexOutOfRangeException("You are out of bounds for the notification index!")
+                };
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0:
+                        MessageNotification = (MessageNotificationStyle)value;
+                        break;
+                    case 1:
+                        MessageWithBitsNotification = (MessageWithBitsNotificationStyle)value;
+                        break;
+                    case 2:
+                        FollowNotification = (FollowNotificationStyle)value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException("You are out of bounds for the notification index!");
+                }
+            }
+        }
+        public IBaseNotificationStyle this[string notification]
+        {
+            get
+            {
+                return notification switch
+                {
+                    "Message" => MessageNotification,
+                    "MessageWithBits" => MessageWithBitsNotification,
+                    "Follow" => FollowNotification,
+                    _ => throw new KeyNotFoundException("The requested notification couldn't be found!")
+                };
+            }
+            set
+            {
+                switch (notification)
+                {
+                    case "Message":
+                        MessageNotification = (MessageNotificationStyle)value;
+                        break;
+                    case "MessageWithBits":
+                        MessageWithBitsNotification = (MessageWithBitsNotificationStyle)value;
+                        break;
+                    case "Follow":
+                        FollowNotification = (FollowNotificationStyle)value;
+                        break;
+                    default:
+                        throw new KeyNotFoundException("The requested notification couldn't be found!");
+                }
+            }
+        }
+
+        public MessageNotificationStyle MessageNotification { get; set; } = new();
+        public MessageWithBitsNotificationStyle MessageWithBitsNotification { get; set; } = new();
+        public FollowNotificationStyle FollowNotification { get; set; } = new();
     }
 
-    public class MessageNotificationStyle
+    public interface IBaseNotificationStyle
     {
+        [JsonIgnore] public string BasePath { get; }
+        
+        public string ImagePath { get; set; }
+    }
+
+    public class MessageNotificationStyle : IBaseNotificationStyle
+    {
+        [JsonIgnore] public string BasePath { get; }
+        public string ImagePath { get; set; }
         public TextBox NameBox { get; set; } = new TextBox();
         public TextBox MessageBox { get; set; } = new TextBox();
         public AvatarBox AvatarBox { get; set; } = new AvatarBox();
-
         public PipeStyle PipeStyle { get; set; } = new PipeStyle();
+
+        public MessageNotificationStyle()
+        {
+            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                "Message");
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
     }
 
-    public class MessageWithBitsNotificationStyle
+    public class MessageWithBitsNotificationStyle : IBaseNotificationStyle
     {
+        [JsonIgnore] public string BasePath { get; }
+        public string ImagePath { get; set; }
         public TextBox NameBox { get; set; } = new TextBox();
         public TextBox MessageBox { get; set; } = new TextBox();
         public TextBox BitsBox { get; set; } = new TextBox();
         public AvatarBox AvatarBox { get; set; } = new AvatarBox();
-
         public PipeStyle PipeStyle { get; set; } = new PipeStyle();
+
+        public MessageWithBitsNotificationStyle()
+        {
+            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                "MessageWithBits");
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+    }
+
+    public class FollowNotificationStyle : IBaseNotificationStyle
+    {
+        [JsonIgnore] public string BasePath { get; set; }
+        public string ImagePath { get; set; }
+        public TextBox NameBox { get; set; } = new TextBox();
+        public PipeStyle PipeStyle { get; set; } = new PipeStyle();
+
+        public FollowNotificationStyle()
+        {
+            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                "Follow");
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
     }
 
     public class TextBox
@@ -91,7 +224,7 @@ namespace OpenVRNotificationPipeIntegration
         public bool StrikeThrough { get; set; } = false;
         public bool Centered { get; set; } = false;
         public int Padding { get; set; } = 0;
-        public Rect Position { get; set; } = new Rect();
+        public Rect Position { get; set; } = new Rect(10, 10, 400, 100);
     }
 
     public class AvatarBox
@@ -101,7 +234,7 @@ namespace OpenVRNotificationPipeIntegration
         public float OutlineThickness { get; set; } = 6;
         public bool OutlineUseChatColor { get; set; } = true;
         public FontColor ManualOutlineColor { get; set; } = new FontColor();
-        public Rect Position { get; set; } = new Rect();
+        public Rect Position { get; set; } = new Rect(6, 6, 75, 75);
     }
 
     public struct Rect
@@ -121,7 +254,7 @@ namespace OpenVRNotificationPipeIntegration
 
         public Rectangle ToRectangle()
         {
-            return new Rectangle(this.X, this.Y, this.Width, this.Height);
+            return new Rectangle(X, Y, Width, Height);
         }
     }
 

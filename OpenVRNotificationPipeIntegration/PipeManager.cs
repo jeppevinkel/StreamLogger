@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using OpenVRNotificationPipeIntegration.EventHandlers;
 using StreamLogger;
 using Websocket.Client;
 
@@ -21,7 +24,7 @@ namespace OpenVRNotificationPipeIntegration
             
             Client.DisconnectionHappened.Subscribe(info =>
             {
-                Log.Warn($"[Pipe] Disconnected, type: {info.Type}\n{info.Exception}");
+                Log.Warn($"[Pipe] Disconnected, type: {info.Type}\n{info.CloseStatusDescription}");
             });
 
             Client.ReconnectTimeout = null;
@@ -30,14 +33,20 @@ namespace OpenVRNotificationPipeIntegration
             Client.Start();
         }
 
-        public static string FormatMessage(string imageData, PipeStyle style)
+        private static string FormatMessage(string imageData, PipeStyle style)
         {
             string msg = JsonSerializer.Serialize(new PipeMessage(imageData, style));
-            Log.Info($"Sending msg: {msg}");
+            Log.Debug($"[Pipe] Formatted msg: {msg}");
             return msg;
         }
 
-        public void Send(string message)
+        public void SendImage(Image img, PipeStyle style)
+        {
+            SendRaw(FormatMessage(img.ToBase64String(ImageFormat.Png),
+                style));
+        }
+
+        public void SendRaw(string message)
         {
             if (!Client.IsRunning)
             {
