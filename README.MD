@@ -1,4 +1,16 @@
-﻿## Events
+﻿## Usage
+
+The program needs to be run once to generate procedural files, which include the config file.  
+After the initial boot of the program, it can be closed again to set the config.
+
+The program needs to be restarted for any config changes to take place, and will automatically populate the config with any integrations or implementations added to the folders.
+
+All integrations are disabled by default, and can be enabled as needed in the config file.
+
+Integrations and implementations work functionally the same way, but the intention is to have a separation between data suppliers and data consumers. An implementation, such as the default Twitch implementation, will take data from an outside source, and send it through to the events in the program.  
+Integrations can then subscribe to the events, and use the supplied data to perform actions. This is intended to accomplish a unified framework that can be used to make tools that work accross multiple streaming platforms.
+
+## Events
 
 ### ChatMessageEvent
 ```c#
