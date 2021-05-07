@@ -21,6 +21,7 @@ namespace ConsoleIntegration
             EventManager.NewSubscriptionEvent += NewSubscriptionEvent;
             EventManager.ReSubscriptionEvent += ReSubscriptionEvent;
             EventManager.FollowEvent += FollowEvent;
+            EventManager.RewardEvent += RewardEvent;
         }
 
         private void ChatMessageEvent(ChatMessageEventArgs e)
@@ -193,6 +194,18 @@ namespace ConsoleIntegration
 
             msg =
                 $"{meta} {e.Follow.DisplayName} is now following {e.Follow.Channel}!";
+
+            Log.Info(msg);
+        }
+
+        private void RewardEvent(RewardEventArgs e)
+        {
+            var meta = $"[{e.Reward.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Reward.Timestamp).ToLocalTime():HH:mm}]";
+
+            string msg;
+
+            msg =
+                $"{meta} {e.Reward.DisplayName} has redeemed {e.Reward.RewardTitle}!";
 
             Log.Info(msg);
         }

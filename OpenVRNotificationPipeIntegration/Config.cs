@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using StreamLogger.Api.Interfaces;
 
 namespace OpenVRNotificationPipeIntegration
@@ -6,6 +7,12 @@ namespace OpenVRNotificationPipeIntegration
     public class Config : IConfig
     {
         public bool Enabled { get; set; } = false;
+
+        [Description("Enable to prevent messages from the broadcaster from showing up.")]
+        public bool IgnoreBroadcaster { get; set; } = false;
+
+        [Description("Messages starting with any of the prefixes listed here will get ignored.")]
+        public string[] IgnorePrefix { get; set; } = new[] {"!"};
 
         public string PipeHost { get; set; } = "ws://localhost";
         public int PipePort { get; set; } = 8077;

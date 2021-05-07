@@ -15,6 +15,7 @@ namespace OpenVRNotificationPipeIntegration
             BaseDir = Path.Combine(Paths.Integrations, Name);
         }
         public static Main Instance => singleton;
+        public static Config MyConfig => singleton.Config;
         
         public readonly string BaseDir;
         public StyleManager StyleManager;

@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Linq;
 using StreamLogger.Api.EventArgs;
 using StreamLogger.Api.MessageTypes;
 
@@ -10,6 +11,16 @@ namespace OpenVRNotificationPipeIntegration.EventHandlers
     {
         public static void OnMessageEvent(ChatMessageEventArgs e)
         {
+            if (Main.MyConfig.IgnoreBroadcaster && e.Message.Broadcaster)
+            {
+                return;
+            }
+            
+            if (Main.MyConfig.IgnorePrefix.Any(s => e.Message.MessageContent.StartsWith(s)))
+            {
+                return;
+            }
+            
             Image notification = null;
             PipeStyle style = null;
             if (e.Message.Bits > 0)

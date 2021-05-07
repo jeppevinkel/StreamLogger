@@ -14,14 +14,18 @@ namespace DiscordIntegration
 
             if (Config.Events.ChatMessage)
                 EventManager.ChatMessageEvent += ChatMessageEvent;
-            if (Config.Events.ChatMessage)
-                EventManager.ChatMessageWithRewardEvent += ChatMessageWithRewardEvent;
             if (Config.Events.HostNotification)
                 EventManager.HostNotificationEvent += HostNotificationEvent;
             if (Config.Events.HostingStarted)
                 EventManager.HostingStartedEvent += HostingStartedEvent;
             if (Config.Events.HostingStopped)
                 EventManager.HostingStoppedEvent += HostingStoppedEvent;
+            if (Config.Events.Follow)
+                EventManager.FollowEvent += FollowEvent;
+            if (Config.Events.Reward)
+                EventManager.RewardEvent += RewardEvent;
+            if (Config.Events.RewardWithText)
+                EventManager.ChatMessageWithRewardEvent += ChatMessageWithRewardEvent;
         }
 
         private void ChatMessageEvent(ChatMessageEventArgs e)
@@ -116,6 +120,30 @@ namespace DiscordIntegration
 
             msg =
                 $"{meta} *No longer hosting with {e.HostingStopped.Viewers} viewers.*";
+
+            SendDiscordWebhook(msg);
+        }
+
+        private void FollowEvent(FollowEventArgs e)
+        {
+            var meta = $"[{e.Follow.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Follow.Timestamp).ToLocalTime():HH:mm}]";
+
+            string msg;
+
+            msg =
+                $"{meta} *{e.Follow.DisplayName} is now following {e.Follow.Channel}!*";
+
+            SendDiscordWebhook(msg);
+        }
+
+        private void RewardEvent(RewardEventArgs e)
+        {
+            var meta = $"[{e.Reward.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Reward.Timestamp).ToLocalTime():HH:mm}]";
+
+            string msg;
+
+            msg =
+                $"{meta} *{e.Reward.DisplayName} has redeemed {e.Reward.RewardTitle}!*";
 
             SendDiscordWebhook(msg);
         }

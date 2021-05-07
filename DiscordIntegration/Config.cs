@@ -32,11 +32,17 @@ namespace DiscordIntegration
             [Description("Called when a message is sent in your channel.")]
             public bool ChatMessage { get; set; } = true;
             [Description("Called when you start hosting someone.")]
-            public bool HostingStarted { get; set; } = true;
+            public bool HostingStarted { get; set; } = false;
             [Description("Called when you stop hosting someone.")]
-            public bool HostingStopped { get; set; } = true;
+            public bool HostingStopped { get; set; } = false;
             [Description("Called when your channel is being hosted.")]
             public bool HostNotification { get; set; } = true;
+            [Description("Called when someone follows your channel.")]
+            public bool Follow { get; set; } = true;
+            [Description("Called when someone reddems a reward on your channel.")]
+            public bool Reward { get; set; } = true;
+            [Description("Called when someone reddems a reward with text on your channel.")]
+            public bool RewardWithText { get; set; } = true;
         }
     }
 }
