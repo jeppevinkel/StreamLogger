@@ -40,7 +40,12 @@ namespace TextToSpeechIntegration
 
         private void OnChatMessageEvent(ChatMessageEventArgs e)
         {
-            if (Config.ExcludePrefix.Contains(e.Message.MessageContent[0]))
+            if (Config.IgnoreBroadcaster && e.Message.Broadcaster)
+            {
+                return;
+            }
+            
+            if (Config.IgnorePrefix.Any(s => e.Message.MessageContent.StartsWith(s)))
             {
                 return;
             }

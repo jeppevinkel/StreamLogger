@@ -24,7 +24,11 @@ namespace TextToSpeechIntegration
 
         [Description("Sets the program to remove emotes before reading the message.")]
         public bool StripEmotes { get; set; } = true;
+        
+        [Description("Enable to prevent messages from the broadcaster from showing up.")]
+        public bool IgnoreBroadcaster { get; set; } = false;
 
-        public char[] ExcludePrefix { get; set; } = {'!'};
+        [Description("Messages starting with any of the prefixes listed here will get ignored.")]
+        public string[] IgnorePrefix { get; set; } = new[] {"!"};
     }
 }
