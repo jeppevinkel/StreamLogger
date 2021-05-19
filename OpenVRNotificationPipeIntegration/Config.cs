@@ -14,6 +14,9 @@ namespace OpenVRNotificationPipeIntegration
         [Description("Messages starting with any of the prefixes listed here will get ignored.")]
         public string[] IgnorePrefix { get; set; } = new[] {"!"};
 
+        [Description("Experimental. Creates new folders for new games that allows a per game basis layout.")]
+        public bool GameSpecificStyles { get; set; } = false;
+
         public string PipeHost { get; set; } = "ws://localhost";
         public int PipePort { get; set; } = 8077;
         public EventToggles EnabledEvents { get; set; } = new EventToggles();

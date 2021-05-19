@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\StreamLogger\StreamLogger.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Websocket.Client" Version="4.3.30" />
+    </ItemGroup>
+
+    <Target Name="CopyBinaryFiles" AfterTargets="Build">
+        <Message Importance="high" Text="Copying assembly to Integrations folder..." />
+        <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(ProjectDir)..\StreamLogger\$(OutputPath)Implementations" ContinueOnError="true" />
+    </Target>
+
+</Project>

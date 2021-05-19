@@ -30,7 +30,7 @@ namespace DiscordIntegration
 
         private void ChatMessageEvent(ChatMessageEventArgs e)
         {
-            var meta = $"[#{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
+            var meta = $"[{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
 
             string modBadge = e.Message.Mod ? Config.Badges.ModeratorBadge : "";
             string broadcasterBadge = e.Message.Broadcaster ? Config.Badges.BroadcasterBadge : "";
@@ -60,7 +60,7 @@ namespace DiscordIntegration
 
         private void ChatMessageWithRewardEvent(ChatMessageWithRewardEventArgs e)
         {
-            var meta = $"[#{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
+            var meta = $"[{e.Message.Channel}][{DateTimeOffset.FromUnixTimeSeconds(e.Message.Timestamp).ToLocalTime():HH:mm}]";
 
             string modBadge = e.Message.Mod ? Config.Badges.ModeratorBadge : "";
             string broadcasterBadge = e.Message.Broadcaster ? Config.Badges.BroadcasterBadge : "";

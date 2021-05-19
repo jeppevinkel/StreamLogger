@@ -22,6 +22,8 @@ namespace TwitchImplementation
         internal Bot _bot;
         internal static readonly HttpClient client = new HttpClient();
         private static Main singleton = new Main();
+        
+        // TODO: Implement clip events
 
         private Main()
         {
@@ -47,7 +49,7 @@ namespace TwitchImplementation
     internal class Bot
     {
         internal readonly TwitchClient _client;
-        internal readonly TwitchPubSub _pubsub;
+        internal readonly TwitchPubSub _pubsub; // TODO: PubSub sometimes starts throwing errors. Usually begins immediately.
         internal readonly TwitchAPI _api;
         internal readonly bool _anonymous = false;
         internal readonly Dictionary<string, string> ChannelDictionary = new Dictionary<string, string>();
@@ -98,7 +100,7 @@ namespace TwitchImplementation
                 {
                     ChannelDictionary.Add(user.Id, user.Login);
                     
-                    _pubsub.ListenToRewards(user.Id); //TODO Make automatic channel id resolution.
+                    _pubsub.ListenToRewards(user.Id);
                     _pubsub.ListenToFollows(user.Id);
                 }
             });

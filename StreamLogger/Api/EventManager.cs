@@ -18,6 +18,7 @@ namespace StreamLogger.Api
         public static event CustomEventHandler<ReSubscriptionEventArgs> ReSubscriptionEvent;
         public static event CustomEventHandler<FollowEventArgs> FollowEvent;
         public static event CustomEventHandler<RewardEventArgs> RewardEvent;
+        public static event CustomEventHandler<GameChangeEventArgs> GameChangeEvent;
 
         public static void OnChatMessageEvent(ChatMessageEventArgs e)
         {
@@ -64,9 +65,16 @@ namespace StreamLogger.Api
             RewardEvent.InvokeSafely(e);
         }
 
+        public static void OnGameChangeEvent(GameChangeEventArgs e)
+        {
+            GameChangeEvent.InvokeSafely(e);
+        }
+
         public static void InvokeSafely<T>(this CustomEventHandler<T> eventHandler, T args) where T : System.EventArgs
         {
             CustomEventHandler<T> raiseEvent = eventHandler;
+
+            if (raiseEvent is null) return;
 
             foreach (CustomEventHandler<T> handler in raiseEvent.GetInvocationList())
             {
@@ -84,6 +92,8 @@ namespace StreamLogger.Api
         public static void InvokeSafely(this CustomEventHandler eventHandler)
         {
             CustomEventHandler raiseEvent = eventHandler;
+
+            if (raiseEvent is null) return;
 
             foreach (CustomEventHandler handler in raiseEvent.GetInvocationList())
             {

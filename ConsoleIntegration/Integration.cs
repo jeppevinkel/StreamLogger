@@ -22,6 +22,7 @@ namespace ConsoleIntegration
             EventManager.ReSubscriptionEvent += ReSubscriptionEvent;
             EventManager.FollowEvent += FollowEvent;
             EventManager.RewardEvent += RewardEvent;
+            EventManager.GameChangeEvent += GameChangeEvent;
         }
 
         private void ChatMessageEvent(ChatMessageEventArgs e)
@@ -206,6 +207,17 @@ namespace ConsoleIntegration
 
             msg =
                 $"{meta} {e.Reward.DisplayName} has redeemed {e.Reward.RewardTitle}!";
+
+            Log.Info(msg);
+        }
+
+        private void GameChangeEvent(GameChangeEventArgs e)
+        {
+            var meta = $"[{DateTimeOffset.Now:HH:mm}]";
+
+            string msg;
+            
+            msg = e.GameChange.GameId == 0 ? $"{meta} The game has been closed." : $"{meta} {e.GameChange.GameName} has been opened.";
 
             Log.Info(msg);
         }

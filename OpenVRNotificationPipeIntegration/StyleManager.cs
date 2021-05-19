@@ -194,8 +194,32 @@ namespace OpenVRNotificationPipeIntegration
 
         public MessageNotificationStyle()
         {
-            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
-                "Message");
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "Message");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "Message");
+            }
+            
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+        public MessageNotificationStyle(string gameId)
+        {
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "Message");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "Message");
+            }
+            
             ImagePath = Path.Combine(BasePath, "bg.png");
         }
     }
@@ -212,7 +236,22 @@ namespace OpenVRNotificationPipeIntegration
 
         public MessageWithBitsNotificationStyle()
         {
-            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "MessageWithBits");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "MessageWithBits");
+            }
+            
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+        public MessageWithBitsNotificationStyle(string gameId)
+        {
+            BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), gameId), "Notifications"),
                 "MessageWithBits");
             ImagePath = Path.Combine(BasePath, "bg.png");
         }
@@ -228,7 +267,22 @@ namespace OpenVRNotificationPipeIntegration
 
         public FollowNotificationStyle()
         {
-            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "Follow");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "Follow");
+            }
+            
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+        public FollowNotificationStyle(string gameId)
+        {
+            BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), gameId), "Notifications"),
                 "Follow");
             ImagePath = Path.Combine(BasePath, "bg.png");
         }
@@ -245,8 +299,33 @@ namespace OpenVRNotificationPipeIntegration
 
         public ReSubscriptionNotificationStyle()
         {
-            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
-                "ReSubscription");
+            
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "ReSubscription");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "ReSubscription");
+            }
+            
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+        public ReSubscriptionNotificationStyle(string gameId)
+        {
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "ReSubscription");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "ReSubscription");
+            }
+            
             ImagePath = Path.Combine(BasePath, "bg.png");
         }
     }
@@ -262,7 +341,22 @@ namespace OpenVRNotificationPipeIntegration
 
         public NewSubscriptionNotificationStyle()
         {
-            BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "NewSubscription");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "NewSubscription");
+            }
+
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+        public NewSubscriptionNotificationStyle(string gameId)
+        {
+            BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), gameId), "Notifications"),
                 "NewSubscription");
             ImagePath = Path.Combine(BasePath, "bg.png");
         }

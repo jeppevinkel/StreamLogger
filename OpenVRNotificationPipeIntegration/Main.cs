@@ -20,6 +20,8 @@ namespace OpenVRNotificationPipeIntegration
         public readonly string BaseDir;
         public StyleManager StyleManager;
         public PipeManager PipeManager;
+
+        public string CurrentGame = "";
         
         /// <inheritdoc/>
         public override void Init()
@@ -86,6 +88,11 @@ namespace OpenVRNotificationPipeIntegration
                 {
                     Log.Warn("[Pipe] The specified background image for `NewSubscription` notification doesn't exist.");
                 }
+            }
+
+            if (Config.GameSpecificStyles)
+            {
+                EventManager.GameChangeEvent += GameChangeEventHandler.OnGameChangeEvent;
             }
         }
 

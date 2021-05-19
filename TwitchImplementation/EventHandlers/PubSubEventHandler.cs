@@ -41,13 +41,13 @@ namespace TwitchImplementation.EventHandlers
                 Timestamp = new DateTimeOffset(e.TimeStamp).ToUnixTimeSeconds(),
                 Username = e.Login
             };
-            
+
             EventManager.OnRewardEvent(new RewardEventArgs(reward));
         }
         
         public void OnPubSubServiceConnected(object sender, EventArgs e)
         {
-            Log.Info("[PubSub] Service connected."); //TODO Get this to work properly.
+            Log.Info("[PubSub] Service connected.");
             try
             {
                 if (_bot._anonymous)
