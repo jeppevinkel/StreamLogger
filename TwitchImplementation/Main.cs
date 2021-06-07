@@ -33,7 +33,7 @@ namespace TwitchImplementation
         public override void Init()
         {
             base.Init();
-
+            
             if (AuthenticationManager.Authenticate())
             {
                 _bot = new Bot();
@@ -64,12 +64,12 @@ namespace TwitchImplementation
             {
                 _api = new TwitchAPI();
                 _api.Settings.ClientId = Main.Instance.Config.ClientId;
-                _api.Settings.AccessToken = AuthenticationManager.TokenData.AccessToken;
+                _api.Settings.AccessToken = Main.Instance.Config.AccessToken;
             }
             
             ConnectionCredentials credentials = anonymous
                 ? new ConnectionCredentials("justinfan123", "justinfan123")
-                : new ConnectionCredentials(Main.Instance.Config.Username, AuthenticationManager.TokenData.AccessToken);
+                : new ConnectionCredentials(Main.Instance.Config.Username, Main.Instance.Config.AccessToken);
             
             var clientOptions = new ClientOptions
             {

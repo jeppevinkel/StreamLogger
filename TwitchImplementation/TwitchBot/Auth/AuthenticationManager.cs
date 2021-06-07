@@ -19,6 +19,8 @@ namespace TwitchImplementation.TwitchBot.Auth
         };
 
         public static TokenData TokenData = new TokenData();
+
+        private static Config Config => Main.Instance.Config;
         
         static readonly string DataDir = Path.Combine(Paths.Implementations, Main.Instance.Name);
         static readonly string DataPath = Path.Combine(DataDir, "TokenData.json");
@@ -26,17 +28,26 @@ namespace TwitchImplementation.TwitchBot.Auth
         public static bool Authenticate()
         {
             TokenData = ReadTokenData();
-            if (string.IsNullOrWhiteSpace(TokenData.RefreshToken) || string.IsNullOrWhiteSpace(Main.Instance.Config.ClientId) || string.IsNullOrWhiteSpace(Main.Instance.Config.ClientSecret))
+
+            if (string.IsNullOrWhiteSpace(Config.AccessToken) && string.IsNullOrWhiteSpace(Config.RefreshToken) && !string.IsNullOrWhiteSpace(TokenData.AccessToken) && !string.IsNullOrWhiteSpace(TokenData.RefreshToken))
             {
-                Log.Warn($"The bot requires ClientId and ClientSecret to be filled out in the config, as well as the RefreshToken in {DataPath} to authenticate with Twitch.");
+                Config.RefreshToken = TokenData.RefreshToken;
+                RefreshToken();
+            }
+            
+            if (string.IsNullOrWhiteSpace(Config.RefreshToken) || string.IsNullOrWhiteSpace(Config.ClientId) || string.IsNullOrWhiteSpace(Config.ClientSecret))
+            {
+                Log.Warn($"[Twitch] The bot requires the ClientId, ClientSecret, and RefreshToken to be filled out in the config to authenticate with Twitch.");
                 return false;
             }
 
-            DateTimeOffset expiry = DateTimeOffset.FromUnixTimeSeconds(TokenData.Expiry);
+            DateTimeOffset expiry = DateTimeOffset.FromUnixTimeSeconds(Config.Expiry);
             bool expired = expiry.CompareTo(DateTimeOffset.UtcNow) <= 0;
+            
+            Log.Debug($"[Twitch] The token is going to expire on {expiry.ToLocalTime():G}");
 
             if (!expired) return ValidateTokenData();
-            Log.Warn("The access token was expired, so I'm requesting a refresh from Twitch.");
+            Log.Warn("[Twitch] The access token was expired, so I'm requesting a refresh from Twitch.");
             try
             {
                 RefreshToken();
@@ -54,9 +65,9 @@ namespace TwitchImplementation.TwitchBot.Auth
             var values = new Dictionary<string, string>
             {
                 { "grant_type", "refresh_token" },
-                { "refresh_token", TokenData.RefreshToken },
-                { "client_id", Main.Instance.Config.ClientId },
-                { "client_secret", Main.Instance.Config.ClientSecret }
+                { "refresh_token", Config.RefreshToken },
+                { "client_id", Config.ClientId },
+                { "client_secret", Config.ClientSecret }
             };
 
             var content = new FormUrlEncodedContent(values);
@@ -74,14 +85,19 @@ namespace TwitchImplementation.TwitchBot.Auth
                 TokenData.Scope = responseData.Scope;
                 TokenData.AccessToken = responseData.AccessToken;
                 TokenData.RefreshToken = responseData.RefreshToken;
-                
+                Config.Expiry = tokenExpiry.ToUnixTimeSeconds();
+                Config.Scope = responseData.Scope;
+                Config.AccessToken = responseData.AccessToken;
+                Config.RefreshToken = responseData.RefreshToken;
+
+                Config.Save();
                 SaveTokenData(TokenData);
             }
         }
 
         public static bool ValidateTokenData()
         {
-            Main.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", TokenData.AccessToken);
+            Main.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", Config.AccessToken);
             var response = Main.client.GetAsync("https://id.twitch.tv/oauth2/validate").Result;
 
             var responseString = response.Content.ReadAsStringAsync().Result;
@@ -112,7 +128,7 @@ namespace TwitchImplementation.TwitchBot.Auth
             {
                 tokenData = new TokenData();
                 SaveTokenData(tokenData);
-                Log.Warn("TokenData is in invalid format. Returning empty object.");
+                Log.Warn("[Twitch] TokenData is in invalid format. Returning empty object.");
             }
             
             return tokenData;

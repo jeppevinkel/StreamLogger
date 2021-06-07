@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using StreamLogger.Api.Extensions;
 using StreamLogger.Api.Interfaces;
@@ -34,6 +36,8 @@ namespace StreamLogger.Api
             .IgnoreFields()
             .IgnoreUnmatchedProperties()
             .Build();
+
+        private static Dictionary<string, IConfig> _loadedConfigs = new();
         
         /// <summary>
         /// Loads all configs.
@@ -116,6 +120,7 @@ namespace StreamLogger.Api
 
                 Log.Info("Configs loaded successfully!");
 
+                _loadedConfigs = deserializedConfigs;
                 return deserializedConfigs;
             }
             catch (Exception exception)
@@ -124,6 +129,65 @@ namespace StreamLogger.Api
 
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Saves the config of the supplied implementation to the config file.
+        /// </summary>
+        /// <param name="implementation">The implementation to save.</param>
+        /// <returns>Returns true if the operation was successful.</returns>
+        public static bool SaveConfig(this IImplementation<IConfig> implementation)
+        {
+            if (!_loadedConfigs.ContainsKey(implementation.Prefix)) return false;
+
+            _loadedConfigs[implementation.Prefix] = implementation.Config;
+
+            return Save(_loadedConfigs);
+        }
+
+        /// <summary>
+        /// Saves the config of the supplied integration to the config file.
+        /// </summary>
+        /// <param name="integration">The integration to save.</param>
+        /// <returns>Returns true if the operation was successful.</returns>
+        public static bool SaveConfig(this IIntegration<IConfig> integration)
+        {
+            if (!_loadedConfigs.ContainsKey(integration.Prefix)) return false;
+
+            _loadedConfigs[integration.Prefix] = integration.Config;
+
+            return Save(_loadedConfigs);
+        }
+
+        /// <summary>
+        /// Saves the supplied config to the config file.
+        /// </summary>
+        /// <param name="config">The config to save.</param>
+        /// <returns>Returns true if the operation was successful.</returns>
+        public static bool Save(this IConfig config)
+        {
+            string configToModify = _loadedConfigs.FirstOrDefault(pair => pair.Value.ToString() == config.ToString()).Key;
+            if (string.IsNullOrWhiteSpace(configToModify)) return false;
+
+            _loadedConfigs[configToModify] = config;
+
+            return Save(_loadedConfigs);
+        }
+
+        /// <summary>
+        /// Modifies a config value and saves it to the config file.
+        /// </summary>
+        /// <param name="config">The config to modify.</param>
+        /// <param name="property">The name of the property to modify.</param>
+        /// <param name="value">The new value of the property.</param>
+        /// <returns>Returns true if the operation was successful.</returns>
+        public static bool SetValue<T>(this IConfig config, string property, T value)
+        {
+            string configToModify = _loadedConfigs.FirstOrDefault(pair => pair.Value.ToString() == config.ToString()).Key;
+
+            if (string.IsNullOrWhiteSpace(configToModify)) return false;
+            
+            return _loadedConfigs[configToModify].TrySetProperty(property, value) && Save(_loadedConfigs);
         }
 
         /// <summary>
@@ -137,7 +201,7 @@ namespace StreamLogger.Api
         /// </summary>
         /// <param name="configs">The configs to be saved, already serialized in yaml format.</param>
         /// <returns>Returns a value indicating whether the configs have been saved successfully or not.</returns>
-        public static bool Save(string configs)
+        private static bool Save(string configs)
         {
             try
             {
@@ -158,7 +222,7 @@ namespace StreamLogger.Api
         /// </summary>
         /// <param name="configs">The configs to be saved.</param>
         /// <returns>Returns a value indicating whether the configs have been saved successfully or not.</returns>
-        public static bool Save(Dictionary<string, IConfig> configs)
+        private static bool Save(ICollection configs)
         {
             try
             {
