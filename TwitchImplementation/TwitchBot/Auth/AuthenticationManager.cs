@@ -91,7 +91,6 @@ namespace TwitchImplementation.TwitchBot.Auth
                 Config.RefreshToken = responseData.RefreshToken;
 
                 Config.Save();
-                SaveTokenData(TokenData);
             }
         }
 
@@ -109,12 +108,9 @@ namespace TwitchImplementation.TwitchBot.Auth
         {
             TokenData tokenData;
             
-            if (!Directory.Exists(DataDir))
-                Directory.CreateDirectory(DataDir);
             if (!File.Exists(DataPath))
             {
                 tokenData = new TokenData();
-                SaveTokenData(tokenData);
                 return tokenData;
             }
             
@@ -127,20 +123,9 @@ namespace TwitchImplementation.TwitchBot.Auth
             catch
             {
                 tokenData = new TokenData();
-                SaveTokenData(tokenData);
-                Log.Warn("[Twitch] TokenData is in invalid format. Returning empty object.");
             }
             
             return tokenData;
-        }
-
-        public static void SaveTokenData(TokenData tokenData)
-        {
-            if (!Directory.Exists(DataDir))
-                Directory.CreateDirectory(DataDir);
-
-            string rawData = JsonSerializer.Serialize(tokenData);
-            File.WriteAllText(DataPath, rawData);
         }
     }
 }
