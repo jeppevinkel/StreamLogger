@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using StreamLogger;
 using StreamLogger.Api;
 using StreamLogger.Api.EventArgs;
 using StreamLogger.Api.MessageTypes.MiscData;
@@ -36,6 +39,33 @@ namespace TextToSpeechIntegration
             {
                 EventManager.ChatMessageWithRewardEvent += OnRewardEvent;
             }
+            
+            Broadcaster.Listen("tts", e =>
+            {
+                try
+                {
+                    var message = JsonSerializer.Deserialize<TtsBroadcast>(e.Message);
+                    VoiceManager.VoiceSettings voiceSettings = VoiceManager.LoadProfile(message.UserId, message.DisplayName);
+
+                    if (!string.IsNullOrEmpty(e.Nonce) && !string.IsNullOrEmpty(e.ReturnTopic))
+                    {
+                        Broadcaster.Publish(e.ReturnTopic, "OK", e.Nonce);
+                        _manager.CustomSynthesize(message.Message, voiceSettings, () =>
+                        {
+                            Broadcaster.Publish(e.ReturnTopic, "DONE", e.Nonce);
+                        });
+                    }
+                    else
+                    {
+                        _manager.CustomSynthesize(message.Message, voiceSettings);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Log.Error($"[TTS] {exception}");
+                    _manager.CustomSynthesize(e.Message, new VoiceManager.VoiceSettings());
+                }
+            });
         }
 
         private void OnChatMessageEvent(ChatMessageEventArgs e)
@@ -196,7 +226,7 @@ namespace TextToSpeechIntegration
                 sb.Append(e.Message.MessageContent);
             }
 
-            _manager.CustomSynthesize(sb.ToString(), voiceSettings.LanguageCode, voiceSettings.Name, voiceSettings.VoiceGender, voiceSettings.SpeakingRate, voiceSettings.Pitch);
+            _manager.CustomSynthesize(sb.ToString(), voiceSettings);
         }
         
         private void OnRewardEvent(ChatMessageWithRewardEventArgs e)
@@ -382,6 +412,16 @@ namespace TextToSpeechIntegration
         private static bool DoesCultureExist(string cultureName)
         {
             return CultureInfo.GetCultures(CultureTypes.AllCultures).Any(culture => string.Equals(culture.Name, cultureName, StringComparison.CurrentCultureIgnoreCase));
+        }
+        
+        public class TtsBroadcast
+        {
+            [JsonPropertyName("userId")]
+            public string UserId { get; set; }
+            [JsonPropertyName("displayName")]
+            public string DisplayName { get; set; }
+            [JsonPropertyName("message")]
+            public string Message { get; set; }
         }
     }
 }

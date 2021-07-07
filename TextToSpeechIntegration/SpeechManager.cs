@@ -27,12 +27,13 @@ namespace TextToSpeechIntegration
         private LibVLC libvlc;
         private MemoryStream stream;
         MediaPlayer mediaPlayer;
+        private Action _playFinishedCallback;
 
         private Task _queueChecker;
 
         private bool _mediaPlayerIdle = true;
 
-        private readonly Queue<byte[]> SpeechQueue = new Queue<byte[]>();
+        private readonly Queue<Audio> SpeechQueue = new ();
         
         private static readonly HttpClient Client = new();
         
@@ -61,12 +62,13 @@ namespace TextToSpeechIntegration
             while (true)
             {
                 await Task.Delay(200);
-                if (!_mediaPlayerIdle || !SpeechQueue.TryDequeue(out byte[] data))
+                if (!_mediaPlayerIdle || !SpeechQueue.TryDequeue(out Audio audio))
                 {
                     continue;
                 }
                 Log.Debug("Playing next audio from queue!");
-                PlayMp3Data(data);
+                PlayMp3Data(audio.Data);
+                _playFinishedCallback = audio.Callback;
             }
         }
 
@@ -88,10 +90,15 @@ namespace TextToSpeechIntegration
             EnqueueSpeech(soundData);
         }
 
+        public void CustomSynthesize(string str, VoiceManager.VoiceSettings settings, Action callback = null)
+        {
+            CustomSynthesize(str, settings.LanguageCode, settings.Name, settings.VoiceGender, settings.SpeakingRate, settings.Pitch, callback);
+        }
+
         public void CustomSynthesize(string str, string languageCode = "en-US", string name = "",
             VoiceSelectionParams.SsmlVoiceGender voiceGender =
                 VoiceSelectionParams.SsmlVoiceGender.SSML_VOICE_GENDER_UNSPECIFIED, float speakingRate = 1,
-            float pitch = 0)
+            float pitch = 0, Action callback = null)
         {
             var voice = new VoiceSelectionParams(languageCode, name, voiceGender);
             var input = new SynthesisInput(str);
@@ -108,13 +115,13 @@ namespace TextToSpeechIntegration
             {
                 byte[] soundData = string.IsNullOrEmpty(responseData?.AudioContent) ? Array.Empty<byte>() : Convert.FromBase64String(responseData.AudioContent);
 
-                EnqueueSpeech(soundData);
+                EnqueueSpeech(soundData, callback);
             }
         }
 
-        public void EnqueueSpeech(byte[] data)
+        public void EnqueueSpeech(byte[] data, Action callback = null)
         {
-            SpeechQueue.Enqueue(data);
+            SpeechQueue.Enqueue(new Audio(data, callback));
             Log.Debug($"Queue now has {SpeechQueue.Count} elements.");
         }
 
@@ -136,6 +143,11 @@ namespace TextToSpeechIntegration
         private void MediaPlayerStopped(object sender, EventArgs e)
         {
             _mediaPlayerIdle = true;
+            if (_playFinishedCallback is not null)
+            {
+                _playFinishedCallback.Invoke();
+                _playFinishedCallback = null;
+            }
             Log.Debug("MediaPLayerStopped!");
         }
         
@@ -216,6 +228,18 @@ namespace TextToSpeechIntegration
                 LINEAR16,
                 MP3,
                 OGG_OPUS
+            }
+        }
+        
+        public class Audio
+        {
+            public byte[] Data;
+            public Action Callback;
+
+            public Audio(byte[] data, Action callback = null)
+            {
+                Data = data;
+                Callback = callback;
             }
         }
     }
