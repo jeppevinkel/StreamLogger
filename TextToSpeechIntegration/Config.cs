@@ -30,5 +30,8 @@ namespace TextToSpeechIntegration
 
         [Description("Messages starting with any of the prefixes listed here will get ignored.")]
         public string[] IgnorePrefix { get; set; } = new[] {"!"};
+
+        [Description("Messages starting with this prefix are parsed as commands.")]
+        public string CommandPrefix { get; set; } = "!";
     }
 }

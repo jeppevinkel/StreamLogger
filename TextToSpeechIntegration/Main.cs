@@ -31,14 +31,9 @@ namespace TextToSpeechIntegration
 
             VoiceManager.LoadProfiles();
             _manager = new SpeechManager();
-            if (Config.ReadAllChat)
-            {
-                EventManager.ChatMessageEvent += OnChatMessageEvent;
-            }
-            else
-            {
-                EventManager.ChatMessageWithRewardEvent += OnRewardEvent;
-            }
+            
+            EventManager.ChatMessageEvent += OnChatMessageEvent;
+            EventManager.ChatMessageWithRewardEvent += OnRewardEvent;
             
             Broadcaster.Listen("tts", e =>
             {
@@ -70,6 +65,48 @@ namespace TextToSpeechIntegration
 
         private void OnChatMessageEvent(ChatMessageEventArgs e)
         {
+            VoiceManager.VoiceSettings voiceSettings;
+            if (e.Message.MessageContent.StartsWith(Config.CommandPrefix) && (e.Message.Broadcaster || e.Message.Mod))
+            {
+                string[] args = e.Message.MessageContent.Split(" ");
+                string command = args.First().Remove(0, Config.CommandPrefix.Length);
+                args = args.Skip(1).ToArray();
+                switch (command)
+                {
+                    case "nick":
+                    {
+                        string username = args[0].ToLower();
+                        if (username.StartsWith("@")) username = username.Remove(0, 1);
+                        string nickname = string.Join(" ", args.Skip(1));
+                        voiceSettings = VoiceManager.LoadProfile(username, nickname);
+                        voiceSettings.ReadableName = nickname;
+                        VoiceManager.SaveProfile(username, voiceSettings);
+                        _manager.CustomSynthesize($"{username} is now called {nickname}", voiceSettings);
+                        break;
+                    }
+                    case "ttson":
+                        voiceSettings = VoiceManager.LoadProfile("global");
+                        if (Config.ReadAllChat)
+                        {
+                            _manager.CustomSynthesize("Global TTS is already enabled!", voiceSettings);
+                            break;
+                        }
+                        _manager.CustomSynthesize("Global TTS on.", voiceSettings);
+                        Config.ReadAllChat = true;
+                        break;
+                    case "ttsoff":
+                        voiceSettings = VoiceManager.LoadProfile("global");
+                        if (!Config.ReadAllChat)
+                        {
+                            _manager.CustomSynthesize("Global TTS is already disabled!", voiceSettings);
+                            break;
+                        }
+                        _manager.CustomSynthesize("Global TTS off.", voiceSettings);
+                        Config.ReadAllChat = false;
+                        break;
+                }
+            }
+            
             if (Config.IgnoreBroadcaster && e.Message.Broadcaster)
             {
                 return;
@@ -79,8 +116,10 @@ namespace TextToSpeechIntegration
             {
                 return;
             }
+            
+            if (!Config.ReadAllChat) return;
 
-            VoiceManager.VoiceSettings voiceSettings = VoiceManager.LoadProfile(e.Message.Username, e.Message.DisplayName);
+            voiceSettings = VoiceManager.LoadProfile(e.Message.Username, e.Message.DisplayName);
             
             var keyValuePairs = e.Message.MessageContent.Split(' ')
                 .Select(x => x.Split(':'))
@@ -194,9 +233,13 @@ namespace TextToSpeechIntegration
 
             StringBuilder sb = new StringBuilder();
             
-            if (e.Message.Flags.Contains("IsMe"))
+            if (e.Message.Flags.Contains("IsMe") && !Config.UseReadableNames)
             {
                 sb.Append($"{e.Message.DisplayName} ");
+            }
+            else if (e.Message.Flags.Contains("IsMe") && Config.UseReadableNames)
+            {
+                sb.Append($"{voiceSettings.ReadableName} ");
             }
             else if (Config.MentionNames && !Config.UseReadableNames)
             {
