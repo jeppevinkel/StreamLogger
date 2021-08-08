@@ -14,6 +14,7 @@ namespace StreamLogger.Api
         public static event CustomEventHandler<HostNotificationEventArgs> HostNotificationEvent; 
         public static event CustomEventHandler<HostingStartedEventArgs> HostingStartedEvent;
         public static event CustomEventHandler<HostingStoppedEventArgs> HostingStoppedEvent;
+        public static event CustomEventHandler<RaidNotificationEventArgs> RaidNotificationEvent;
         public static event CustomEventHandler<NewSubscriptionEventArgs> NewSubscriptionEvent;
         public static event CustomEventHandler<ReSubscriptionEventArgs> ReSubscriptionEvent;
         public static event CustomEventHandler<FollowEventArgs> FollowEvent;
@@ -43,6 +44,11 @@ namespace StreamLogger.Api
         public static void OnHostingStoppedEvent(HostingStoppedEventArgs e)
         {
             HostingStoppedEvent.InvokeSafely(e);
+        }
+
+        public static void OnRaidNotificationEvent(RaidNotificationEventArgs e)
+        {
+            RaidNotificationEvent.InvokeSafely(e);
         }
 
         public static void OnNewSubscriptionEvent(NewSubscriptionEventArgs e)

@@ -118,6 +118,7 @@ namespace TwitchImplementation
             _client.OnHostingStarted += ClientEventHandler.OnHostingStarted;
             _client.OnHostingStopped += ClientEventHandler.OnHostingStopped;
             _client.OnBeingHosted += ClientEventHandler.OnBeingHosted;
+            _client.OnRaidNotification += ClientEventHandler.OnRaidNotification;
 
             _client.Connect();
         }

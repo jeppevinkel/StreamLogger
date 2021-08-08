@@ -90,6 +90,18 @@ namespace OpenVRNotificationPipeIntegration
                 }
             }
 
+            if (Config.EnabledEvents.RaidEvent)
+            {
+                if (File.Exists(StyleManager.NotificationStyles.RaidNotification.ImagePath))
+                {
+                    EventManager.RaidNotificationEvent += RaidNotificationEventHandler.OnRaidNotificationEventHandler;
+                }
+                else
+                {
+                    Log.Warn("[Pipe] The specified background image for `Raid` notification doesn't exist.");
+                }
+            }
+
             if (Config.GameSpecificStyles)
             {
                 EventManager.GameChangeEvent += GameChangeEventHandler.OnGameChangeEvent;

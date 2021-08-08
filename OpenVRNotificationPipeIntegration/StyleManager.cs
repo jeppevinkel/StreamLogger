@@ -32,6 +32,7 @@ namespace OpenVRNotificationPipeIntegration
             NotificationStyles.FollowNotification = LoadStyle(NotificationStyles.FollowNotification);
             NotificationStyles.ReSubscription = LoadStyle(NotificationStyles.ReSubscription);
             NotificationStyles.NewSubscription = LoadStyle(NotificationStyles.NewSubscription);
+            NotificationStyles.RaidNotification = LoadStyle(NotificationStyles.RaidNotification);
         }
 
         private void SaveStyle<T>(T style) where T : IBaseNotificationStyle
@@ -90,7 +91,7 @@ namespace OpenVRNotificationPipeIntegration
 
     public class NotificationStyles
     {
-        public const int Length = 5;
+        public const int Length = 6;
 
         public IBaseNotificationStyle this[int index]
         {
@@ -103,6 +104,7 @@ namespace OpenVRNotificationPipeIntegration
                     2 => FollowNotification,
                     3 => ReSubscription,
                     4 => NewSubscription,
+                    5 => RaidNotification,
                     _ => throw new IndexOutOfRangeException("You are out of bounds for the notification index!")
                 };
             }
@@ -125,6 +127,9 @@ namespace OpenVRNotificationPipeIntegration
                     case 4:
                         NewSubscription = (NewSubscriptionNotificationStyle)value;
                         break;
+                    case 5:
+                        RaidNotification = (RaidNotificationStyle)value;
+                        break;
                     default:
                         throw new IndexOutOfRangeException("You are out of bounds for the notification index!");
                 }
@@ -141,6 +146,7 @@ namespace OpenVRNotificationPipeIntegration
                     "Follow" => FollowNotification,
                     "ReSubscription" => ReSubscription,
                     "NewSubscription" => NewSubscription,
+                    "Raid" => RaidNotification,
                     _ => throw new KeyNotFoundException("The requested notification couldn't be found!")
                 };
             }
@@ -163,6 +169,9 @@ namespace OpenVRNotificationPipeIntegration
                     case "NewSubscription":
                         NewSubscription = (NewSubscriptionNotificationStyle)value;
                         break;
+                    case "Raid":
+                        RaidNotification = (RaidNotificationStyle)value;
+                        break;
                     default:
                         throw new KeyNotFoundException("The requested notification couldn't be found!");
                 }
@@ -174,6 +183,7 @@ namespace OpenVRNotificationPipeIntegration
         public FollowNotificationStyle FollowNotification { get; set; } = new();
         public ReSubscriptionNotificationStyle ReSubscription { get; set; } = new();
         public NewSubscriptionNotificationStyle NewSubscription { get; set; } = new();
+        public RaidNotificationStyle RaidNotification { get; set; } = new();
     }
 
     public interface IBaseNotificationStyle
@@ -358,6 +368,47 @@ namespace OpenVRNotificationPipeIntegration
         {
             BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), gameId), "Notifications"),
                 "NewSubscription");
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+    }
+    
+    public class RaidNotificationStyle : IBaseNotificationStyle
+    {
+        [JsonIgnore] public string BasePath { get; }
+        public string ImagePath { get; set; }
+        public TextBox NameBox { get; set; } = new TextBox();
+        public TextBox MessageBox { get; set; } = new TextBox();
+        public AvatarBox AvatarBox { get; set; } = new AvatarBox();
+        public PipeStyle PipeStyle { get; set; } = new PipeStyle();
+
+        public RaidNotificationStyle()
+        {
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "Raid");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "Raid");
+            }
+            
+            ImagePath = Path.Combine(BasePath, "bg.png");
+        }
+        public RaidNotificationStyle(string gameId)
+        {
+            if (string.IsNullOrEmpty(Main.Instance.CurrentGame))
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Notifications"),
+                    "Raid");
+            }
+            else
+            {
+                BasePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Paths.Integrations, Main.Instance.Name), "Games"), Main.Instance.CurrentGame), "Notifications"),
+                    "Raid");
+            }
+            
             ImagePath = Path.Combine(BasePath, "bg.png");
         }
     }

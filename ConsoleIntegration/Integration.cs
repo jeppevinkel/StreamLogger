@@ -18,6 +18,7 @@ namespace ConsoleIntegration
             EventManager.HostNotificationEvent += HostNotificationEvent;
             EventManager.HostingStartedEvent += HostingStartedEvent;
             EventManager.HostingStoppedEvent += HostingStoppedEvent;
+            EventManager.RaidNotificationEvent += RaidNotificationEvent;
             EventManager.NewSubscriptionEvent += NewSubscriptionEvent;
             EventManager.ReSubscriptionEvent += ReSubscriptionEvent;
             EventManager.FollowEvent += FollowEvent;
@@ -141,6 +142,18 @@ namespace ConsoleIntegration
 
             msg =
                 $"{meta} No longer hosting with {e.HostingStopped.Viewers} viewers.";
+
+            Log.Info(msg);
+        }
+
+        private void RaidNotificationEvent(RaidNotificationEventArgs e)
+        {
+            var meta = $"[{e.RaidNotification.TargetChannel}][{DateTimeOffset.FromUnixTimeSeconds(e.RaidNotification.Timestamp).ToLocalTime():HH:mm}]";
+
+            string msg;
+
+            msg =
+                $"{meta} {e.RaidNotification.SystemMessage}";
 
             Log.Info(msg);
         }

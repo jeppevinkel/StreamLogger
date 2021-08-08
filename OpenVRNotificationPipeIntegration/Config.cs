@@ -34,6 +34,6 @@ namespace OpenVRNotificationPipeIntegration
         public bool FollowEvent { get; set; } = false;
         public bool NewSubscriptionEvent { get; set; } = false;
         public bool ReSubscriptionEvent { get; set; } = false;
-        // public bool HostEvent { get; set; } = false;
+        public bool RaidEvent { get; set; } = false;
     }
 }

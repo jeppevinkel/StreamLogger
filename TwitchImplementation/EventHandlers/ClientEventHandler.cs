@@ -14,12 +14,13 @@ using ChatMessage = StreamLogger.Api.MessageTypes.ChatMessage;
 using Emote = StreamLogger.Api.MessageTypes.MiscData.Emote;
 using HostingStarted = StreamLogger.Api.MessageTypes.HostingStarted;
 using HostingStopped = StreamLogger.Api.MessageTypes.HostingStopped;
+using RaidNotification = StreamLogger.Api.MessageTypes.RaidNotification;
 
 namespace TwitchImplementation.EventHandlers
 {
     public static class ClientEventHandler
     {
-        public static string[] DefaultColors =
+        private static readonly string[] DefaultColors =
         {
             "#1E90FF",
             "#FF69B4"
@@ -74,7 +75,7 @@ namespace TwitchImplementation.EventHandlers
 
                 if (!string.IsNullOrWhiteSpace(e.ChatMessage.CustomRewardId))
                 {
-                    ChatMessageWithReward chatMsgWithRewards = new ChatMessageWithReward(
+                    var chatMsgWithRewards = new ChatMessageWithReward(
                         e.ChatMessage.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
                         colorHex,
                         e.ChatMessage.DisplayName,
@@ -98,13 +99,13 @@ namespace TwitchImplementation.EventHandlers
                         e.ChatMessage.Message,
                         e.ChatMessage.CustomRewardId);
 
-                    ChatMessageWithRewardEventArgs messageWithRewatdEventArgs =
+                    var messageWithRewardEventArgs =
                         new ChatMessageWithRewardEventArgs(chatMsgWithRewards);
-                    EventManager.OnChatMessageWithRewardEvent(messageWithRewatdEventArgs);
+                    EventManager.OnChatMessageWithRewardEvent(messageWithRewardEventArgs);
                     return;
                 }
 
-                ChatMessage chatMsg = new ChatMessage(
+                var chatMsg = new ChatMessage(
                     e.ChatMessage.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
                     colorHex,
                     e.ChatMessage.DisplayName,
@@ -127,7 +128,7 @@ namespace TwitchImplementation.EventHandlers
                     avatarUrl,
                     e.ChatMessage.Message);
 
-                ChatMessageEventArgs messageEventArgs = new ChatMessageEventArgs(chatMsg);
+                var messageEventArgs = new ChatMessageEventArgs(chatMsg);
                 EventManager.OnChatMessageEvent(messageEventArgs);
             }
             catch (Exception exception)
@@ -138,7 +139,7 @@ namespace TwitchImplementation.EventHandlers
 
         public static void OnHostingStarted(object sender, OnHostingStartedArgs e)
         {
-            HostingStartedEventArgs hostingStartedEventArgs = new HostingStartedEventArgs(
+            var hostingStartedEventArgs = new HostingStartedEventArgs(
                 new HostingStarted(
                     e.HostingStarted.TargetChannel,
                     e.HostingStarted.HostingChannel,
@@ -149,7 +150,7 @@ namespace TwitchImplementation.EventHandlers
 
         public static void OnHostingStopped(object sender, OnHostingStoppedArgs e)
         {
-            HostingStoppedEventArgs hostingStoppedEventArgs = new HostingStoppedEventArgs(
+            var hostingStoppedEventArgs = new HostingStoppedEventArgs(
                 new HostingStopped(
                     e.HostingStopped.HostingChannel,
                     e.HostingStopped.Viewers,
@@ -159,13 +160,13 @@ namespace TwitchImplementation.EventHandlers
 
         public static void OnBeingHosted(object sender, OnBeingHostedArgs e)
         {
-            HostNotification hostNotification = new HostNotification(
+            var hostNotification = new HostNotification(
                 e.BeingHostedNotification.Channel,
                 e.BeingHostedNotification.HostedByChannel,
                 e.BeingHostedNotification.Viewers,
                 e.BeingHostedNotification.IsAutoHosted,
                 DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-            HostNotificationEventArgs hostNotificationEventArgs = new HostNotificationEventArgs(hostNotification);
+            var hostNotificationEventArgs = new HostNotificationEventArgs(hostNotification);
             EventManager.OnHostNotificationEvent(hostNotificationEventArgs);
         }
         
@@ -179,9 +180,9 @@ namespace TwitchImplementation.EventHandlers
         {
             DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(e.Subscriber.TmiSentTs));
 
-            HashSet<string> flags = new HashSet<string>();
+            var flags = new HashSet<string>();
 
-            SubscriptionPlan subPlan = SubscriptionPlan.NotSet;
+            var subPlan = SubscriptionPlan.NotSet;
 
             subPlan = e.Subscriber.SubscriptionPlan switch
             {
@@ -200,7 +201,7 @@ namespace TwitchImplementation.EventHandlers
                 avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.Subscriber.UserId).Result.Logo;
             }
 
-            Subscription subscription = new Subscription(
+            var subscription = new Subscription(
                 e.Subscriber.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
                 e.Subscriber.ColorHex,
                 e.Subscriber.DisplayName,
@@ -227,7 +228,7 @@ namespace TwitchImplementation.EventHandlers
                 int.Parse(e.Subscriber.MsgParamStreakMonths),
                 e.Subscriber.SystemMessageParsed);
             
-            NewSubscriptionEventArgs newSubscriptionEventArgs = new NewSubscriptionEventArgs(subscription);
+            var newSubscriptionEventArgs = new NewSubscriptionEventArgs(subscription);
             EventManager.OnNewSubscriptionEvent(newSubscriptionEventArgs);
         }
         
@@ -235,9 +236,9 @@ namespace TwitchImplementation.EventHandlers
         {
             DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(e.ReSubscriber.TmiSentTs));
 
-            HashSet<string> flags = new HashSet<string>();
+            var flags = new HashSet<string>();
 
-            SubscriptionPlan subPlan = SubscriptionPlan.NotSet;
+            var subPlan = SubscriptionPlan.NotSet;
 
             subPlan = e.ReSubscriber.SubscriptionPlan switch
             {
@@ -256,7 +257,7 @@ namespace TwitchImplementation.EventHandlers
                 avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.ReSubscriber.UserId).Result.Logo;
             }
 
-            Subscription subscription = new Subscription(
+            var subscription = new Subscription(
                 e.ReSubscriber.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
                 e.ReSubscriber.ColorHex,
                 e.ReSubscriber.DisplayName,
@@ -283,8 +284,37 @@ namespace TwitchImplementation.EventHandlers
                 int.Parse(e.ReSubscriber.MsgParamStreakMonths),
                 e.ReSubscriber.SystemMessageParsed);
             
-            ReSubscriptionEventArgs reSubscriptionEventArgs = new ReSubscriptionEventArgs(subscription);
+            var reSubscriptionEventArgs = new ReSubscriptionEventArgs(subscription);
             EventManager.OnReSubscriptionEvent(reSubscriptionEventArgs);
+        }
+
+        public static void OnRaidNotification(object sender, OnRaidNotificationArgs e)
+        {
+            DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(e.RaidNotification.TmiSentTs));
+            
+            string avatarUrl = null;
+
+            if (Main.Instance._bot._api is not null)
+            {
+                avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.RaidNotification.UserId).Result.Logo;
+            }
+            
+            EventManager.OnRaidNotificationEvent(new RaidNotificationEventArgs(new RaidNotification
+            {
+                Badges = e.RaidNotification.Badges.ToDictionary(b => b.Key, b => int.Parse(b.Value)),
+                Color = e.RaidNotification.Color,
+                Mod = e.RaidNotification.Moderator,
+                Subscriber = e.RaidNotification.Subscriber,
+                Timestamp = dto.ToUnixTimeSeconds(),
+                Username = e.RaidNotification.Login,
+                DisplayName = e.RaidNotification.DisplayName,
+                RaidingChannel = e.RaidNotification.DisplayName,
+                SystemMessage = e.RaidNotification.SystemMsgParsed,
+                TargetChannel = e.Channel,
+                UserId = e.RaidNotification.UserId,
+                AvatarUrl = avatarUrl,
+                UserType = e.RaidNotification.UserType.ToString()
+            }));
         }
     }
 }

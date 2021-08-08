@@ -37,6 +37,8 @@ namespace DiscordIntegration
             public bool HostingStopped { get; set; } = false;
             [Description("Called when your channel is being hosted.")]
             public bool HostNotification { get; set; } = true;
+            [Description("Called when your channel is being raided.")]
+            public bool RaidNotification { get; set; } = true;
             [Description("Called when someone follows your channel.")]
             public bool Follow { get; set; } = true;
             [Description("Called when someone reddems a reward on your channel.")]

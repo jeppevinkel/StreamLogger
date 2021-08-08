@@ -20,6 +20,8 @@ namespace DiscordIntegration
                 EventManager.HostingStartedEvent += HostingStartedEvent;
             if (Config.Events.HostingStopped)
                 EventManager.HostingStoppedEvent += HostingStoppedEvent;
+            if (Config.Events.RaidNotification)
+                EventManager.RaidNotificationEvent += RaidNotificationEvent;
             if (Config.Events.Follow)
                 EventManager.FollowEvent += FollowEvent;
             if (Config.Events.Reward)
@@ -120,6 +122,18 @@ namespace DiscordIntegration
 
             msg =
                 $"{meta} *No longer hosting with {e.HostingStopped.Viewers} viewers.*";
+
+            SendDiscordWebhook(msg);
+        }
+
+        private void RaidNotificationEvent(RaidNotificationEventArgs e)
+        {
+            var meta = $"[{e.RaidNotification.TargetChannel}][{DateTimeOffset.FromUnixTimeSeconds(e.RaidNotification.Timestamp).ToLocalTime():HH:mm}]";
+
+            string msg;
+
+            msg =
+                $"{meta} *{e.RaidNotification.SystemMessage}*";
 
             SendDiscordWebhook(msg);
         }
