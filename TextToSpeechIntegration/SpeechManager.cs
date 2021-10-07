@@ -39,7 +39,7 @@ namespace TextToSpeechIntegration
         
         public SpeechManager()
         {
-            Core.Initialize(@"D:\jeppe\Documents\Rider Projects\StreamLogger\TextToSpeechIntegration\bin\Debug\net5.0\libvlc\win-x64");
+            Core.Initialize(@"C:\Users\jeppe\Documents\RiderProjects\StreamLogger\TextToSpeechIntegration\bin\Debug\net5.0\libvlc\win-x64");
             libvlc = new LibVLC(false);
             libvlc.Log += (sender, args) =>
             {

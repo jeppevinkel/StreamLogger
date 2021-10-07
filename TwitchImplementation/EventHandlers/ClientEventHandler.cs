@@ -70,7 +70,8 @@ namespace TwitchImplementation.EventHandlers
 
                 if (Main.Instance._bot._api is not null)
                 {
-                    avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.ChatMessage.UserId).Result.Logo;
+                    avatarUrl = Main.Instance._bot._api.Helix.Users
+                        .GetUsersAsync(new List<string>() {e.ChatMessage.UserId}).Result.Users.First().ProfileImageUrl;
                 }
 
                 if (!string.IsNullOrWhiteSpace(e.ChatMessage.CustomRewardId))
@@ -198,7 +199,8 @@ namespace TwitchImplementation.EventHandlers
 
             if (Main.Instance._bot._api is not null)
             {
-                avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.Subscriber.UserId).Result.Logo;
+                avatarUrl = Main.Instance._bot._api.Helix.Users
+                    .GetUsersAsync(new List<string>() {e.Subscriber.UserId}).Result.Users.First().ProfileImageUrl;
             }
 
             var subscription = new Subscription(
@@ -254,7 +256,8 @@ namespace TwitchImplementation.EventHandlers
 
             if (Main.Instance._bot._api is not null)
             {
-                avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.ReSubscriber.UserId).Result.Logo;
+                avatarUrl = Main.Instance._bot._api.Helix.Users
+                    .GetUsersAsync(new List<string>() {e.ReSubscriber.UserId}).Result.Users.First().ProfileImageUrl;
             }
 
             var subscription = new Subscription(
@@ -296,7 +299,8 @@ namespace TwitchImplementation.EventHandlers
 
             if (Main.Instance._bot._api is not null)
             {
-                avatarUrl = Main.Instance._bot._api.V5.Users.GetUserByIDAsync(e.RaidNotification.UserId).Result.Logo;
+                avatarUrl = Main.Instance._bot._api.Helix.Users
+                    .GetUsersAsync(new List<string>() {e.RaidNotification.UserId}).Result.Users.First().ProfileImageUrl;
             }
             
             EventManager.OnRaidNotificationEvent(new RaidNotificationEventArgs(new RaidNotification

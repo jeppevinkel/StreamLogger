@@ -9,8 +9,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="LibVLCSharp" Version="3.5.0" />
-      <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.12" />
+      <PackageReference Include="LibVLCSharp" Version="3.6.0" />
+      <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.16" />
     </ItemGroup>
 
     <Target Name="CopyBinaryFiles" AfterTargets="Build">
